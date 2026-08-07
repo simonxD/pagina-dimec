@@ -1,0 +1,32 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/* `static` evita que Tailwind descarte las variables que ningún utilitario
+   menciona: Nuxt UI necesita la escala --color-usm-50..950 en tiempo de
+   ejecución para construir el color primario. */
+@theme static {
+  /* Colores institucionales medidos en comunicaciones.usm.cl */
+  --color-usm: #005e90;        /* azul de la barra superior y del pie */
+  --color-usm-banda: #333333;  /* gris de la banda de logos */
+  --color-usm-nav: #3b424c;    /* texto del menú principal */
+  --color-usm-dorado: #e5b300; /* subrayado del menú y enlaces del pie al pasar el cursor */
+  --color-usm-oscuro: #074469; /* fondo del menú desplegable al pasar el cursor */
+
+  /* Escala completa del azul institucional, para que Nuxt UI la use como
+     color primario. El 500 es el azul de la marca: sobre él, el texto blanco
+     alcanza 8:1 de contraste (el verde por defecto se quedaba en 2,2:1). */
+  --color-usm-50: #e8f2f8;
+  --color-usm-100: #cce3f0;
+  --color-usm-200: #99c7e1;
+  --color-usm-300: #5fa8cf;
+  --color-usm-400: #2b8ec2;
+  --color-usm-500: #005e90;
+  --color-usm-600: #005681;
+  --color-usm-700: #004b71;
+  --color-usm-800: #003f5f;
+  --color-usm-900: #00344e;
+  --color-usm-950: #002337;
+
+  /* Tipografía. @nuxt/fonts la descarga y autoaloja sola. */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}

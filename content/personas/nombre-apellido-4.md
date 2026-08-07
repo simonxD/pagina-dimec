@@ -1,0 +1,17 @@
+---
+nombre: 'Nombre Apellido'
+cargo: 'Profesor asistente'
+categoria: jornada
+orden: 4
+grado: 'Doctor en Ingeniería Mecánica'
+email: 'correo@ejemplo.cl'
+foto: ''
+areas: ['fluidos', 'termicos']
+intereses: ['Mecánica de fluidos computacional', 'Turbomáquinas']
+investigaciones: []
+publicaciones: []
+docencia: []
+enlaces: []
+---
+
+Reemplaza este párrafo por la reseña real.

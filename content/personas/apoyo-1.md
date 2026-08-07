@@ -1,0 +1,16 @@
+---
+nombre: 'Nombre Apellido'
+cargo: 'Apoyo académico'
+categoria: apoyo
+orden: 1
+email: 'correo@ejemplo.cl'
+foto: ''
+areas: []
+intereses: []
+investigaciones: []
+publicaciones: []
+docencia: []
+enlaces: []
+---
+
+
