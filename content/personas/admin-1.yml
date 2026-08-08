@@ -1,14 +1,12 @@
-nombre: 'Nombre Apellido'
-cargo: 'Secretaria del Departamento'
+cargo: Secretaria del Departamento
 categoria: administrativos
+email: correo@ejemplo.cl
+foto: ""
+nombre: Nombre Apellido Persona
 orden: 1
-email: 'correo@ejemplo.cl'
-telefono: '+56 32 000 0000'
-foto: ''
-areas: []
-intereses: []
-investigaciones: []
-publicaciones: []
-docencia: []
-enlaces: []
-resena: ''
+resena: hola hola
+telefono: +56 32 000 0000
+enlaces:
+  - label: texto
+    url: usm.cl
+  - {}
