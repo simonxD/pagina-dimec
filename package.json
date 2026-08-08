@@ -22,5 +22,8 @@
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.121",
     "@iconify-json/simple-icons": "^1.2.93"
+  },
+  "patchedDependencies": {
+    "nuxt-studio@1.7.0": "patches/nuxt-studio@1.7.0.patch"
   }
 }

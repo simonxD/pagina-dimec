@@ -297,30 +297,56 @@ GitHub:    https://dimec.pollomongoliano.cc/__nuxt_studio/auth/github
 **La autoría en git se pierde con la puerta de Microsoft**: todos los commits
 llevan la firma del dueño del `STUDIO_GITHUB_TOKEN`, no de quien editó.
 
-### 4.5. Lo que NO se puede personalizar del editor
+### 4.5. El parche a nuxt-studio
 
-Conviene saberlo antes de intentarlo, porque se pierde tiempo buscando la opción.
+Dos cosas del editor no son configurables porque están incrustadas en su código
+compilado: el selector de formato al crear un archivo y los textos de los
+botones. Se resolvieron con un **parche persistente de bun**.
 
-**El selector de formato al crear un archivo** (md / yaml / yml / json) no se
-puede quitar ni limitar. La lista está incrustada en el código compilado del
-editor:
-
-```js
-var wO = (e => (e.Markdown="md", e.YAML="yaml", e.YML="yml", e.JSON="json", e))(wO||{})
+```
+patches/nuxt-studio@1.7.0.patch     el parche (4,2 MB, ver más abajo)
+package.json → patchedDependencies  lo registra
 ```
 
-No se deriva de la configuración de las colecciones. Mitigación aplicada: la
-colección `personas` acepta `.yml`, `.yaml` **y** `.json`, así que solo falla la
-opción `md` — que por desgracia es la marcada por defecto. Hay un aviso en la
-página `/entrar`.
+No es editar `node_modules` a mano: bun reaplica el parche en cada instalación.
+Comprobado borrando `node_modules` entero y reinstalando desde cero.
 
-**Los textos de los botones** («Nuevo archivo», «Publicar») tampoco se pueden
-cambiar por otros propios: viven en los ficheros de idioma del paquete. Lo que sí
-se hizo es activar el español con `studio.i18n.defaultLocale`, porque el módulo
-trae la traducción completa y por defecto sale en inglés.
+**Qué cambia**, todo dentro de `dist/app/`:
 
-Parchear el paquete en `node_modules` funcionaría, pero se perdería en cada
-`bun install` y rompería en cada actualización. No se ha hecho.
+| Antes | Después |
+|---|---|
+| `KO=[wO.Markdown,wO.YAML,wO.YML,wO.JSON]` | `KO=[wO.YML]` |
+| `default:qt(wO).Markdown` | `default:qt(wO).YML` |
+| `"createDocument":"Nuevo archivo"` | `"Agregar funcionario"` |
+| `"createDocument":"Crear un nuevo archivo"` | `"Agregar un funcionario nuevo"` |
+| `"fileName":"Nombre del archivo"` | `"nombre-apellido"` |
+
+Se filtra la **lista** `KO`, no el enum `wO`: cada valor del enum se referencia
+7-8 veces en el bundle y quitarlos rompería el editor.
+
+**Tres cosas que hay que tener presentes:**
+
+1. **Los textos son globales, no por colección.** El botón dirá «Agregar
+   funcionario» también en Páginas. Se aceptó porque las páginas son ficheros
+   fijos y nadie crea páginas nuevas; el único sitio donde se crea de verdad es
+   Personas.
+2. **Al actualizar `nuxt-studio` el parche puede no aplicar.** Entonces la
+   instalación **falla con un error**, no se aplica a medias en silencio. Hay que
+   rehacerlo: `bun patch nuxt-studio`, repetir las sustituciones de la tabla, y
+   `bun patch --commit node_modules/nuxt-studio`.
+3. **El fichero pesa 4,2 MB** porque el bundle está minificado en una sola línea
+   y el diff arrastra la línea entera. Es feo pero inevitable.
+
+Lo que sí es configuración y no parche: el idioma español, con
+`studio.i18n.defaultLocale`. El módulo trae la traducción completa y por defecto
+sale en inglés.
+
+**El endpoint `/__nuxt_studio/auth/session` devuelve el `accessToken` de la
+sesión** a quien esté identificado. Con la puerta de cuentas propias eso es el
+`STUDIO_GITHUB_TOKEN` del servidor: cualquier editor puede extraerlo. Es diseño
+del módulo. Por eso el token debe tener el alcance mínimo (`public_repo`, o
+*fine-grained* limitado a este repositorio) y por eso importa quién está en la
+lista de editores.
 
 **El endpoint `/__nuxt_studio/auth/session` devuelve el `accessToken` de la
 sesión** a quien esté identificado. Con la puerta de cuentas propias eso es el
