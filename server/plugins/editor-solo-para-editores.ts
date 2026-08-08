@@ -30,5 +30,19 @@ export default defineNitroPlugin((nitro) => {
     html.head = html.head.map(entrada =>
       entrada.replace(/<link[^>]*rel="prefetch"[^>]*>/g, '')
     )
+
+    // La configuracion publica de Nuxt viaja en el HTML e incluye el usuario y
+    // el nombre del repositorio de GitHub. Cualquier visitante podia leerlos en
+    // el codigo fuente de la pagina sin abrir nada mas.
+    //
+    // Solo hacen falta para publicar, asi que se vacian cuando no hay sesion.
+    // Se conserva la forma del objeto -mismas claves, valores vacios- porque
+    // borrarlo entero haria fallar al codigo del editor que lo lee.
+    const vaciarRepositorio = (texto: string) => texto.replace(
+      /repository:\{provider:"[^"]*",owner:"[^"]*",repo:"[^"]*",branch:"[^"]*"/g,
+      'repository:{provider:"",owner:"",repo:"",branch:""'
+    )
+    html.body = html.body.map(vaciarRepositorio)
+    html.bodyAppend = html.bodyAppend.map(vaciarRepositorio)
   })
 })

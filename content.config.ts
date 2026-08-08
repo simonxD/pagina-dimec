@@ -1,5 +1,52 @@
 import { defineCollection, defineContentConfig, z } from '@nuxt/content'
 import { fileURLToPath } from 'node:url'
+import { readdirSync, readFileSync, statSync } from 'node:fs'
+
+/**
+ * Intereses que ya usan otras personas del Departamento.
+ *
+ * Se leen de las fichas existentes en cada compilacion y se muestran como ayuda
+ * del campo. No es un autocompletado -Studio solo admite textarea, media e icon
+ * como tipos de control, y activar el selector con busqueda exigiria reescribir
+ * el renderizador de campos dentro de su codigo minificado- pero resuelve el
+ * problema de fondo: que cada cual escriba "Energia solar", "energia solar" y
+ * "Solar termica" para la misma cosa. Teniendo la lista delante se copia el
+ * termino que ya existe.
+ */
+function interesesEnUso(): string[] {
+  const raiz = fileURLToPath(new URL('content/personas', import.meta.url))
+  const encontrados = new Set<string>()
+
+  const recorrer = (dir: string) => {
+    for (const entrada of readdirSync(dir)) {
+      const ruta = `${dir}/${entrada}`
+      if (statSync(ruta).isDirectory()) { recorrer(ruta); continue }
+      if (!/\.(yml|yaml)$/.test(entrada)) continue
+      const texto = readFileSync(ruta, 'utf8')
+      // Lista YAML en linea: intereses: ['A', 'B']
+      const enLinea = texto.match(/^intereses:\s*\[(.*)\]/m)?.[1]
+      if (enLinea) {
+        for (const t of enLinea.split(',')) {
+          const v = t.trim().replace(/^['"]|['"]$/g, '')
+          if (v) encontrados.add(v)
+        }
+      }
+      // Lista YAML por bloques
+      const bloque = texto.match(/^intereses:\s*\n((?:\s*-\s*.*\n?)+)/m)?.[1]
+      if (bloque) {
+        for (const l of bloque.split('\n')) {
+          const v = l.replace(/^\s*-\s*/, '').trim().replace(/^['"]|['"]$/g, '')
+          if (v) encontrados.add(v)
+        }
+      }
+    }
+  }
+
+  try { recorrer(raiz) } catch { /* sin fichas todavia */ }
+  return [...encontrados].sort((a, b) => a.localeCompare(b, 'es'))
+}
+
+const interesesConocidos = interesesEnUso()
 
 /**
  * Colecciones de contenido del sitio.
@@ -101,7 +148,12 @@ export default defineContentConfig({
         areas: z.array(z.string()).default([])
           .editor({ label: 'Áreas del Departamento', description: 'Identificadores de app/utils/areas.ts. Ejemplo: termicos' }),
         intereses: z.array(z.string()).default([])
-          .editor({ label: 'Intereses', description: 'Uno por elemento. Ejemplo: Combustión' }),
+          .editor({
+            label: 'Intereses',
+            description: interesesConocidos.length
+              ? `Uno por elemento. Si alguno coincide con los que ya se usan, cópialo tal cual para que agrupen: ${interesesConocidos.join(' · ')}`
+              : 'Uno por elemento. Ejemplo: Combustión'
+          }),
 
         investigaciones: z.array(z.object({
           titulo: linea('Título'),
