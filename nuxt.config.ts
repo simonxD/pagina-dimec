@@ -24,7 +24,15 @@ export default defineNuxtConfig({
       // Si algun dia se vuelve privado hay que poner private: true, o la API
       // respondera 404 al buscar la rama: un token sin permiso no distingue
       // entre "no existe" y "no puedes verlo".
-      private: false
+      private: false,
+      // Studio calcula su direccion base como `${instanceUrl}/api/v3` cuando el
+      // host no es github.com: es la via prevista para GitHub Enterprise. Se
+      // aprovecha para que todas sus llamadas pasen por el proxy de este mismo
+      // servidor, que comprueba permisos y anade el token real.
+      //
+      // Sin esto, el navegador hablaria directo con la API de GitHub y cualquier
+      // permiso seria decorativo.
+      instanceUrl: 'https://dimec.pollomongoliano.cc/git'
     },
     // El editor lo va a usar gente del Departamento, no desarrolladores. Se
     // recortan las herramientas que solo tienen sentido escribiendo codigo o

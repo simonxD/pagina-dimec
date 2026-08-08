@@ -380,27 +380,39 @@ quitarse a sí mismo el rol de administrador ni borrar su propia cuenta, y no se
 puede eliminar la última cuenta con permisos de administración. Sin ellas habría
 que reparar el JSON a mano en el servidor.
 
-#### Lo que el rol NO controla
+#### Cómo se aplican de verdad
 
-**El rol decide quién gestiona cuentas, no qué puede editar cada persona.**
+Los permisos **se comprueban en el servidor**, no en la interfaz.
 
-Nuxt Studio publica llamando a `https://api.github.com` **desde el navegador**,
-con el token en la sesión. Cualquiera que entre al editor puede leer ese token
-—está en `/__nuxt_studio/auth/session`— y escribir en cualquier fichero del
-repositorio. Un permiso por carpeta implementado en esta aplicación sería
-decorativo: se vería aplicado y se saltaría abriendo las herramientas del
-navegador.
+Studio publica llamando a la API de GitHub desde el navegador, con el token en la
+sesión. Tal cual, cualquier editor podía leer ese token en
+`/__nuxt_studio/auth/session` y escribir en cualquier fichero saltándose todo.
 
-Para que fuese real habría que **interponer el servidor**: parchear Studio para
-que su URL base apunte a un endpoint propio en vez de a la API de GitHub, y que
-ese endpoint compruebe el usuario de la sesión contra el fichero que intenta
-escribir antes de reenviar la petición con el token, que dejaría de salir del
-servidor. Es un proyecto en sí mismo —hay que cubrir todas las llamadas que
-Studio hace: referencias, árboles, blobs, commits— y cualquiera que se escape
-rompe la publicación.
+Se resuelve con dos piezas:
 
-Mientras tanto: la lista de cuentas es la barrera real. Quien está dentro puede
-tocarlo todo.
+1. **`repository.instanceUrl` apunta a este servidor.** Studio calcula su
+   dirección base como `${instanceUrl}/api/v3` cuando el host no es github.com
+   —la vía prevista para GitHub Enterprise—, así que todas sus llamadas pasan por
+   `server/routes/git/api/v3/[...ruta].ts`. Es configuración, no un parche.
+2. **La sesión ya no lleva el token real**, sino un valor inservible. El token
+   verdadero lo añade el proxy al reenviar, y nunca sale de la máquina.
+
+El proxy no reimplementa la API de GitHub: reenvía. Lo que hace antes es mirar
+quién es por la sesión y qué ficheros trae la petición. Las rutas salen del cuerpo
+al crear un árbol (`POST /git/trees`), que es donde se ven todas las de una
+publicación, y de la dirección en las escrituras directas (`/contents/...`).
+
+| Rol | Puede escribir |
+|---|---|
+| `admin` | Todo |
+| `editor` con `ficha` | Solo su propia ficha de Personas |
+| `editor` sin `ficha` | `content/paginas/` y `public/`, ninguna ficha ajena |
+
+Las lecturas no se restringen: el repositorio es público y quien tiene sesión ya
+ve el contenido en el editor.
+
+**Esto solo interviene al publicar.** El sitio público no pasa por el proxy y su
+velocidad queda igual.
 
 ### 4.7. Por qué no PocketBase ni Firebase
 

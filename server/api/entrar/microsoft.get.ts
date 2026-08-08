@@ -172,6 +172,10 @@ export default eventHandler(async (event) => {
     avatar: ''
   })
 
+  // El token real no debe llegar al navegador: las publicaciones pasan por el
+  // proxy de /git, que lo pone del lado del servidor.
+  await vaciarTokenDeLaSesion(event)
+
   const destino = decodeURIComponent(getCookie(event, 'studio-redirect') || '')
   deleteCookie(event, 'studio-redirect')
   return sendRedirect(event, destino.startsWith('/') && !destino.startsWith('//') ? destino : '/')

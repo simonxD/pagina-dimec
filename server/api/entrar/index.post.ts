@@ -58,6 +58,10 @@ export default eventHandler(async (event) => {
     avatar: ''
   })
 
+  // El token real no debe llegar al navegador: las publicaciones pasan por el
+  // proxy de /git, que lo pone del lado del servidor.
+  await vaciarTokenDeLaSesion(event)
+
   return { ok: true }
 })
 
