@@ -327,9 +327,16 @@ comprueba que el commit llegó a `origin/main`. Si hay un fallo anotado, ahí es
 el motivo. Para forzar: ejecuta `desplegar.ps1` a mano.
 
 **Una persona no aparece en `/personas`**
-Revisa su `categoria` contra los cuatro valores válidos y que tenga `nombre` y
-`cargo`. Un fichero que no cumple el esquema se descarta sin avisar. Para ver qué
-ingirió realmente el sitio, consulta `.output\server\contents.sqlite`.
+Revisa que tenga `title` (el único campo sin valor por defecto) y que su
+`categoria`, si está puesta, sea uno de los cuatro valores válidos. Un fichero que
+no cumple el esquema se descarta sin avisar. Para ver qué ingirió realmente el
+sitio, consulta `.output\server\contents.sqlite`:
+
+```js
+import Database from 'better-sqlite3'
+const db = new Database('C:/dimec/.output/server/contents.sqlite', { readonly: true })
+console.log(db.prepare('SELECT title, cargo, categoria FROM _content_personas').all())
+```
 
 **`/_studio` da 404**
 No hay ningún proveedor de autenticación configurado: falta
