@@ -30,3 +30,16 @@
   /* Tipografía. @nuxt/fonts la descarga y autoaloja sola. */
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
+
+/* Contraste del texto secundario.
+
+   Nuxt UI resuelve `text-muted` a slate-500 (#62748e). Sobre el gris claro que
+   usan varias tarjetas y listados (#f5f5f5) eso da 4,36:1, por debajo del 4,5:1
+   que exige la norma para texto normal. Lighthouse lo marcaba como el único
+   fallo de accesibilidad del sitio.
+
+   Se baja a slate-600, que sube el contraste por encima de 6:1 sin cambiar el
+   tono. Es un oscurecimiento leve, no un color distinto. */
+:root {
+  --ui-text-muted: var(--color-slate-600);
+}
