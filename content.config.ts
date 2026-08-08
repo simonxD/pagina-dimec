@@ -6,128 +6,138 @@ import { fileURLToPath } from 'node:url'
  *
  * Hay dos grupos, y la diferencia importa:
  *
- *  - Lo que vive en `content/` lo gestiona nuxt-studio: aparece en el editor de
- *    /_studio y se puede cambiar desde el navegador.
+ *  - Lo que vive en `content/` lo gestiona nuxt-studio: aparece en el editor y
+ *    se puede cambiar desde el navegador.
  *  - Lo que vive en `datos/` queda fuera del editor a proposito, porque lo va a
  *    escribir un proceso automatico y editarlo a mano solo generaria conflictos.
  *
- * Sobre los esquemas: no son decorativos. Studio construye el formulario de
- * edicion a partir de ellos, asi que cada campo declarado aparece como un
- * control con su tipo, y lo que no este declarado no se puede editar. Por eso
- * se usan colecciones de tipo `data` (YAML) para las paginas: producen un
- * formulario con campos con nombre, en vez de un editor de texto libre donde
- * alguien sin experiencia tecnica se pierde.
+ * ── Sobre los esquemas ──
  *
- * Los .describe() se convierten en el texto de ayuda de cada campo dentro del
- * formulario. Merece la pena escribirlos pensando en quien va a editar.
+ * No son decorativos: Studio construye el formulario de edicion a partir de
+ * ellos. Cada campo declarado aparece como un control, y lo que no este
+ * declarado no se puede editar.
+ *
+ * Se usa `.editor()` en lugar de `.describe()` porque permite tres cosas que
+ * cambian por completo como se ve el formulario:
+ *
+ *   label        el nombre visible del campo. Sin el, Studio muestra la clave
+ *                del esquema tal cual ("areasFormacion", "tituloHistoria"),
+ *                que no significa nada para quien mantiene el contenido.
+ *   description  texto de ayuda debajo del campo.
+ *   input        el tipo de control. 'textarea' es imprescindible en cualquier
+ *                campo de mas de una frase: el control por defecto es una linea
+ *                unica que corta el texto visualmente sin avisar de nada.
+ *
+ * Los tipos de control que Studio reconoce son 'textarea', 'media' e 'icon'.
+ * No hay un control de texto enriquecido para campos: negritas, listas y
+ * encabezados solo existen en el cuerpo markdown de las colecciones `page`.
  */
+
+/** Texto de varias frases. Se repite mucho, y siempre necesita area multilinea. */
+const parrafo = (label: string, description?: string) =>
+  z.string().editor({ input: 'textarea', label, ...(description ? { description } : {}) })
+
+/** Texto de una linea. */
+const linea = (label: string, description?: string) =>
+  z.string().editor({ label, ...(description ? { description } : {}) })
 
 /** Enlace reutilizable. Se repite en varias paginas. */
 const enlace = z.object({
-  label: z.string().describe('Texto visible del enlace'),
-  to: z.string().describe('Direccion. Interna como /contacto, o externa completa con https://'),
-  externo: z.boolean().default(false).describe('Marcar si lleva fuera del sitio: se abre en otra pestana')
+  label: linea('Texto del botón', 'Lo que se lee. Ejemplo: Ver oportunidades'),
+  to: linea('Dirección', 'Interna como /contacto, o externa completa con https://'),
+  externo: z.boolean().default(false)
+    .editor({ label: '¿Sale del sitio?', description: 'Marcar si lleva a otra web: se abrirá en una pestaña nueva' })
 })
 
 export default defineContentConfig({
   collections: {
     // ─────────────────────────────────────────────────────────────────────
-    // Personas. Un fichero por persona, en content/personas/.
+    // Personas. Un fichero por persona.
     //
     // Esa division por fichero no es casual: cuando se anadan permisos por
     // usuario, dar acceso a un profesor a su propia ficha se reduce a acotarlo
-    // a su fichero. Si todas las personas vivieran en un unico YAML no habria
-    // forma de separar quien puede tocar que.
+    // a su fichero. Si todas vivieran en un unico YAML no habria forma de
+    // separar quien puede tocar que.
+    //
+    // Es `data` y no `page`: una coleccion `page` arrastra title, description,
+    // seo, navigation, body y extension, y Studio los muestra todos. Eso
+    // obligaba a escribir el nombre tres veces y enseñaba un bloque SEO que no
+    // significa nada para quien no es tecnico. El SEO se genera igual, desde
+    // app/pages/personas/[slug].vue.
     // ─────────────────────────────────────────────────────────────────────
     personas: defineCollection({
-      // `data` y no `page`. La diferencia decide como se ve el editor.
-      //
-      // Una coleccion `page` arrastra un esquema propio de Nuxt Content con
-      // title, description, seo, navigation, body, extension y path, y Studio
-      // los muestra todos. En la practica eso obligaba a escribir el nombre de
-      // la persona tres veces (Title, Title de SEO y el campo propio), mostraba
-      // un bloque SEO que no significa nada para quien no es tecnico, abria un
-      // editor de markdown aparte para el cuerpo, y al crear una ficha preguntaba
-      // si se queria en md, yaml, json, csv o xml.
-      //
-      // Con `data` no se hereda nada: el formulario tiene exactamente los campos
-      // de aqui abajo, y el fichero es siempre .yml. El SEO se sigue generando,
-      // pero desde el codigo a partir del nombre y el cargo.
       type: 'data',
-      // Se aceptan las tres extensiones de datos, no solo .yml, aunque lo normal
-      // sea usar .yml.
-      //
-      // Al crear una ficha, Studio pregunta el formato con un desplegable
-      // (md / yaml / yml / json) que NO se puede quitar ni configurar: la lista
-      // esta incrustada en el codigo compilado del editor. Si la coleccion solo
-      // aceptara .yml, elegir "yaml" o "json" crearia un fichero que el sitio
-      // ignora en silencio, sin error y sin pista de por que esa persona no
-      // aparece. Aceptando las tres, cualquier eleccion razonable funciona.
-      //
-      // La unica que sigue sin servir es "md", que es ademas la opcion por
-      // defecto del desplegable: un markdown no encaja en una coleccion de
-      // datos. Esta avisado en el README y en la pagina de entrada.
+      // Se aceptan las tres extensiones de datos porque el desplegable de
+      // formato de Studio no distingue por coleccion. Si solo valiera .yml,
+      // elegir otra crearia un fichero que el sitio ignora en silencio.
       source: 'personas/*.{yml,yaml,json}',
       schema: z.object({
-        nombre: z.string().describe('Nombre y apellidos, tal como debe aparecer en la web'),
+        nombre: linea('Nombre', 'Nombre y apellidos, tal como deben verse en la web'),
 
         // Los campos obligatorios llevan valor por defecto para que una ficha
-        // recien creada se vea en la web enseguida, con textos evidentes de
-        // completar. Es preferible a que desaparezca sin motivo visible: Nuxt
-        // Content descarta en silencio lo que no cumple el esquema, sin error.
+        // recien creada aparezca enseguida, con textos evidentes de completar.
+        // Es preferible a que desaparezca: Nuxt Content descarta en silencio lo
+        // que no cumple el esquema, sin error ni aviso.
         cargo: z.string().default('Cargo por completar')
-          .describe('Cargo o titulo. Ejemplo: Profesor titular'),
+          .editor({ label: 'Cargo', description: 'Ejemplo: Profesora asociada' }),
         categoria: z.enum(['jornada', 'parttime', 'apoyo', 'administrativos'])
           .default('jornada')
-          .describe('Pestana de /personas donde aparece esta persona'),
+          .editor({ label: 'Categoría', description: 'Decide en qué pestaña de Personas aparece' }),
         orden: z.number().default(100)
-          .describe('Posicion dentro de su pestana. El numero mas bajo aparece primero'),
-        grado: z.string().optional().describe('Grado academico. Ejemplo: Doctor en Ingenieria Mecanica'),
-        email: z.string().optional().describe('Correo institucional'),
-        telefono: z.string().optional(),
-        oficina: z.string().optional().describe('Ubicacion de la oficina'),
-        web: z.string().optional().describe('Pagina personal, con https://'),
-        foto: z.string().optional()
-          .describe('Ruta de la foto dentro de public/personas/. Ejemplo: /personas/nombre.jpg'),
-        areas: z.array(z.string()).default([])
-          .describe('Areas del Departamento a las que pertenece. Identificadores de app/utils/areas.ts'),
-        intereses: z.array(z.string()).default([])
-          .describe('Intereses de investigacion, uno por linea'),
-        investigaciones: z.array(z.object({
-          titulo: z.string(),
-          resumen: z.string(),
-          url: z.string().optional()
-        })).default([]).describe('Investigaciones destacadas'),
-        publicaciones: z.array(z.object({
-          titulo: z.string(),
-          medio: z.string().describe('Revista, congreso o editorial'),
-          anio: z.number(),
-          url: z.string().optional()
-        })).default([]).describe('Publicaciones recientes'),
-        docencia: z.array(z.object({
-          codigo: z.string().describe('Codigo de la asignatura. Ejemplo: IWM101'),
-          nombre: z.string()
-        })).default([]).describe('Asignaturas que imparte'),
-        enlaces: z.array(z.object({
-          label: z.string(),
-          url: z.string()
-        })).default([]).describe('Enlaces externos: ORCID, Google Scholar, LinkedIn...'),
+          .editor({ label: 'Orden', description: 'Posición dentro de su pestaña. El número más bajo aparece primero' }),
 
-        // Sustituye al cuerpo markdown que tenia la coleccion cuando era `page`.
-        // Es texto corriente: se separan parrafos dejando una linea en blanco, y
-        // no hace falta saber markdown para escribirlo.
+        grado: z.string().optional()
+          .editor({ label: 'Grado académico', description: 'Ejemplo: Doctor en Ingeniería Mecánica' }),
+        email: z.string().optional().editor({ label: 'Correo' }),
+        telefono: z.string().optional().editor({ label: 'Teléfono' }),
+        oficina: z.string().optional()
+          .editor({ label: 'Oficina', description: 'Ejemplo: Edificio C, oficina 210' }),
+        web: z.string().optional()
+          .editor({ label: 'Página personal', description: 'Dirección completa, con https://' }),
+        foto: z.string().optional()
+          .editor({ input: 'media', label: 'Fotografía', description: 'Se guarda en public/personas/' }),
+
+        areas: z.array(z.string()).default([])
+          .editor({ label: 'Áreas del Departamento', description: 'Identificadores de app/utils/areas.ts. Ejemplo: termicos' }),
+        intereses: z.array(z.string()).default([])
+          .editor({ label: 'Intereses de investigación', description: 'Uno por elemento' }),
+
+        investigaciones: z.array(z.object({
+          titulo: linea('Título'),
+          resumen: parrafo('Resumen', 'Una o dos frases sobre el objetivo y el estado'),
+          url: z.string().optional().editor({ label: 'Enlace' })
+        })).default([]).editor({ label: 'Investigaciones destacadas' }),
+
+        publicaciones: z.array(z.object({
+          titulo: linea('Título'),
+          medio: linea('Publicado en', 'Revista, congreso o editorial'),
+          anio: z.number().editor({ label: 'Año' }),
+          url: z.string().optional().editor({ label: 'Enlace' })
+        })).default([]).editor({ label: 'Publicaciones recientes' }),
+
+        docencia: z.array(z.object({
+          codigo: linea('Código', 'Ejemplo: IWM101'),
+          nombre: linea('Asignatura')
+        })).default([]).editor({ label: 'Docencia' }),
+
+        enlaces: z.array(z.object({
+          label: linea('Nombre del enlace', 'Ejemplo: ORCID'),
+          url: linea('Dirección')
+        })).default([]).editor({ label: 'Enlaces externos' }),
+
         resena: z.string().default('')
-          .describe('Texto que aparece en "Acerca de". Deja una linea en blanco entre parrafos')
+          .editor({
+            input: 'textarea',
+            label: 'Acerca de',
+            description: 'Reseña que aparece en su ficha. Deja una línea en blanco entre párrafos'
+          })
       })
     }),
 
     // ─────────────────────────────────────────────────────────────────────
-    // Noticias. Fuera de content/ y por tanto fuera del editor.
-    //
-    // Estan pensadas para alimentarse solas desde las redes sociales mediante
-    // API. Dejarlas editables invitaria a escribir a mano algo que un proceso
-    // automatico va a sobrescribir, y ese conflicto es dificil de diagnosticar
-    // despues. Cuando exista la integracion, escribira en datos/noticias/.
+    // Noticias. Fuera de content/ y por tanto fuera del editor: las alimentara
+    // un proceso automatico desde las redes sociales. Sin etiquetas de editor
+    // porque nadie las va a editar a mano.
     // ─────────────────────────────────────────────────────────────────────
     noticias: defineCollection({
       type: 'page',
@@ -146,14 +156,11 @@ export default defineContentConfig({
     }),
 
     // ─────────────────────────────────────────────────────────────────────
-    // Paginas. Una coleccion por pagina, con los campos que esa pagina usa de
-    // verdad.
+    // Paginas. Una coleccion por pagina, con los campos que esa pagina usa.
     //
-    // Podria haberse hecho con una sola coleccion generica de "secciones", pero
-    // el formulario resultante seria una lista de cajas llamadas "seccion" y
-    // "elemento", sin relacion visible con lo que se ve en la web. Separandolas,
-    // el menu de Studio queda como un espejo del sitio y cada campo se llama
-    // como la cosa que edita.
+    // Con una coleccion generica de "secciones" el formulario seria una lista
+    // de cajas llamadas `seccion` y `elemento`, sin relacion visible con la
+    // web. Separandolas, el menu del editor es un espejo del sitio.
     //
     // Inicio no esta aqui: se dejo fuera de la edicion a peticion expresa.
     // ─────────────────────────────────────────────────────────────────────
@@ -161,22 +168,22 @@ export default defineContentConfig({
       type: 'data',
       source: 'paginas/departamento.yml',
       schema: z.object({
-        intro: z.string().describe('Parrafo de entrada, debajo del titulo'),
+        intro: parrafo('Texto de entrada', 'Párrafo que abre la página, debajo del título'),
         valores: z.array(z.object({
-          titulo: z.string().describe('Mision, Vision, ...'),
-          texto: z.string().default('').describe('Contenido de la tarjeta')
-        })).default([]),
-        tituloHistoria: z.string().default('Nuestra Historia'),
+          titulo: linea('Título de la tarjeta', 'Misión, Visión...'),
+          texto: parrafo('Contenido')
+        })).default([]).editor({ label: 'Misión, visión y vinculación' }),
+        tituloHistoria: linea('Título de la sección de historia').default('Nuestra Historia'),
         historia: z.array(z.object({
-          periodo: z.string().describe('Rango de anos. Ejemplo: 1932 - 1939'),
-          texto: z.string().describe('Que ocurrio en ese periodo')
-        })).default([]),
-        tituloEstructura: z.string().default('Estructura'),
+          periodo: linea('Periodo', 'Ejemplo: 1932 – 1939'),
+          texto: parrafo('Qué pasó', 'Relato del periodo. Puede ocupar varios párrafos')
+        })).default([]).editor({ label: 'Historia del Departamento' }),
+        tituloEstructura: linea('Título de la sección de estructura').default('Estructura'),
         estructura: z.array(z.object({
-          cargo: z.string().describe('Nombre del cargo'),
-          persona: z.string().describe('Quien lo ocupa'),
-          slug: z.string().describe('Fichero de esa persona en Personas, sin .md. Ejemplo: nombre-apellido-1')
-        })).default([])
+          cargo: linea('Cargo'),
+          persona: linea('Quién lo ocupa'),
+          slug: linea('Ficha en Personas', 'Nombre del archivo de esa persona, sin extensión')
+        })).default([]).editor({ label: 'Estructura del Departamento' })
       })
     }),
 
@@ -184,12 +191,12 @@ export default defineContentConfig({
       type: 'data',
       source: 'paginas/estudios.yml',
       schema: z.object({
-        intro: z.string().default(''),
+        intro: parrafo('Texto de entrada').default(''),
         programas: z.array(z.object({
-          titulo: z.string(),
-          descripcion: z.string(),
-          to: z.string().describe('Pagina a la que lleva la tarjeta. Ejemplo: /pregrado')
-        })).default([])
+          titulo: linea('Título'),
+          descripcion: parrafo('Descripción'),
+          to: linea('Página a la que lleva', 'Ejemplo: /pregrado')
+        })).default([]).editor({ label: 'Tipos de programa' })
       })
     }),
 
@@ -197,15 +204,15 @@ export default defineContentConfig({
       type: 'data',
       source: 'paginas/pregrado.yml',
       schema: z.object({
-        intro: z.string().default(''),
+        intro: parrafo('Texto de entrada').default(''),
         areasFormacion: z.array(z.object({
-          titulo: z.string().describe('Nombre del area de formacion'),
-          descripcion: z.string()
-        })).default([]).describe('Areas de formacion de la carrera'),
+          titulo: linea('Área'),
+          descripcion: parrafo('Qué se estudia en ella')
+        })).default([]).editor({ label: 'Áreas de formación' }),
         campus: z.array(z.object({
-          nombre: z.string(),
-          detalle: z.string().describe('Direccion')
-        })).default([]).describe('Campus donde se imparte')
+          nombre: linea('Campus'),
+          detalle: linea('Dirección')
+        })).default([]).editor({ label: 'Dónde se imparte' })
       })
     }),
 
@@ -213,12 +220,12 @@ export default defineContentConfig({
       type: 'data',
       source: 'paginas/postgrado.yml',
       schema: z.object({
-        intro: z.string().default(''),
+        intro: parrafo('Texto de entrada').default(''),
         programas: z.array(z.object({
-          id: z.string().describe('Identificador para enlazar desde el menu. No usar espacios ni tildes'),
-          titulo: z.string(),
-          descripcion: z.string()
-        })).default([])
+          id: linea('Identificador', 'Para enlazar desde el menú. Sin espacios ni tildes'),
+          titulo: linea('Nombre del programa'),
+          descripcion: parrafo('Descripción')
+        })).default([]).editor({ label: 'Programas' })
       })
     }),
 
@@ -226,11 +233,11 @@ export default defineContentConfig({
       type: 'data',
       source: 'paginas/educacion-continua.yml',
       schema: z.object({
-        intro: z.string().default(''),
+        intro: parrafo('Texto de entrada').default(''),
         modalidades: z.array(z.object({
-          titulo: z.string(),
-          descripcion: z.string()
-        })).default([])
+          titulo: linea('Modalidad'),
+          descripcion: parrafo('En qué consiste')
+        })).default([]).editor({ label: 'Modalidades' })
       })
     }),
 
@@ -238,13 +245,13 @@ export default defineContentConfig({
       type: 'data',
       source: 'paginas/asignaturas.yml',
       schema: z.object({
-        intro: z.string().default(''),
+        intro: parrafo('Texto de entrada').default(''),
         asignaturas: z.array(z.object({
-          codigo: z.string().describe('Codigo oficial. Ejemplo: IWM101'),
-          nombre: z.string(),
-          nivel: z.enum(['Pregrado', 'Postgrado']),
-          creditos: z.number()
-        })).default([])
+          codigo: linea('Código', 'Ejemplo: IWM101'),
+          nombre: linea('Nombre'),
+          nivel: z.enum(['Pregrado', 'Postgrado']).editor({ label: 'Nivel' }),
+          creditos: z.number().editor({ label: 'Créditos' })
+        })).default([]).editor({ label: 'Catálogo de asignaturas' })
       })
     }),
 
@@ -252,17 +259,16 @@ export default defineContentConfig({
       type: 'data',
       source: 'paginas/investigacion.yml',
       schema: z.object({
-        intro: z.string().default(''),
+        intro: parrafo('Texto de entrada').default(''),
         // El identificador de cada area lo fija app/utils/areas.ts porque las
         // fichas de personas apuntan a el. Aqui solo se edita su descripcion:
-        // cambiar un identificador desde el editor romperia esas referencias
-        // en silencio.
+        // cambiar un identificador desde el editor romperia esas referencias.
         descripciones: z.array(z.object({
           area: z.enum(['termicos', 'fluidos', 'renovables', 'produccion',
                         'mantenimiento', 'mecatronica', 'solidos'])
-            .describe('Area del Departamento'),
-          texto: z.string().describe('Descripcion que aparece bajo el nombre del area')
-        })).default([])
+            .editor({ label: 'Área' }),
+          texto: parrafo('Descripción', 'Aparece bajo el nombre del área')
+        })).default([]).editor({ label: 'Áreas de investigación' })
       })
     }),
 
@@ -270,11 +276,11 @@ export default defineContentConfig({
       type: 'data',
       source: 'paginas/laboratorios.yml',
       schema: z.object({
-        intro: z.string().default(''),
+        intro: parrafo('Texto de entrada').default(''),
         laboratorios: z.array(z.object({
-          nombre: z.string(),
-          detalle: z.string().describe('Campus o ubicacion')
-        })).default([])
+          nombre: linea('Nombre'),
+          detalle: linea('Ubicación', 'Campus donde está')
+        })).default([]).editor({ label: 'Laboratorios' })
       })
     }),
 
@@ -282,13 +288,13 @@ export default defineContentConfig({
       type: 'data',
       source: 'paginas/campus.yml',
       schema: z.object({
-        intro: z.string().default(''),
+        intro: parrafo('Texto de entrada').default(''),
         campus: z.array(z.object({
-          nombre: z.string(),
-          direccion: z.string(),
-          telefono: z.string().default(''),
-          detalle: z.string().describe('Que hay en este campus')
-        })).default([])
+          nombre: linea('Nombre'),
+          direccion: linea('Dirección'),
+          telefono: linea('Teléfono').default(''),
+          detalle: parrafo('Qué hay en este campus')
+        })).default([]).editor({ label: 'Campus' })
       })
     }),
 
@@ -296,11 +302,11 @@ export default defineContentConfig({
       type: 'data',
       source: 'paginas/oportunidades.yml',
       schema: z.object({
-        intro: z.string().default(''),
+        intro: parrafo('Texto de entrada').default(''),
         sectores: z.array(z.object({
-          titulo: z.string().describe('Sector. Ejemplo: Energia'),
-          descripcion: z.string()
-        })).default([])
+          titulo: linea('Sector', 'Ejemplo: Energía'),
+          descripcion: parrafo('Qué se hace en él')
+        })).default([]).editor({ label: 'Sectores' })
       })
     }),
 
@@ -308,12 +314,12 @@ export default defineContentConfig({
       type: 'data',
       source: 'paginas/sitios-estudiantiles.yml',
       schema: z.object({
-        intro: z.string().default(''),
+        intro: parrafo('Texto de entrada').default(''),
         sitios: z.array(z.object({
-          nombre: z.string(),
-          descripcion: z.string(),
-          url: z.string().describe('Direccion completa, con https://')
-        })).default([])
+          nombre: linea('Nombre'),
+          descripcion: parrafo('Para qué sirve'),
+          url: linea('Dirección', 'Completa, con https://')
+        })).default([]).editor({ label: 'Plataformas' })
       })
     }),
 
@@ -321,13 +327,13 @@ export default defineContentConfig({
       type: 'data',
       source: 'paginas/vinculacion.yml',
       schema: z.object({
-        intro: z.string().default(''),
+        intro: parrafo('Texto de entrada').default(''),
         secciones: z.array(z.object({
-          id: z.string().describe('Identificador para enlazar desde el menu. Sin espacios ni tildes'),
-          titulo: z.string(),
-          texto: z.string(),
-          enlace: enlace
-        })).default([])
+          id: linea('Identificador', 'Para enlazar desde el menú. Sin espacios ni tildes'),
+          titulo: linea('Título'),
+          texto: parrafo('Contenido'),
+          enlace: enlace.editor({ label: 'Botón' })
+        })).default([]).editor({ label: 'Secciones' })
       })
     }),
 
@@ -335,14 +341,14 @@ export default defineContentConfig({
       type: 'data',
       source: 'paginas/contacto.yml',
       schema: z.object({
-        intro: z.string().default(''),
-        tituloDatos: z.string().default('Datos de contacto'),
+        intro: parrafo('Texto de entrada').default(''),
+        tituloDatos: linea('Título del recuadro lateral').default('Datos de contacto'),
         datos: z.array(z.object({
-          label: z.string().describe('Que es. Ejemplo: Direccion, Telefono'),
-          valor: z.string(),
+          label: linea('Qué es', 'Ejemplo: Dirección, Teléfono'),
+          valor: linea('Valor'),
           icon: z.string().default('i-lucide-info')
-            .describe('Icono de lucide.dev. Ejemplo: i-lucide-map-pin')
-        })).default([])
+            .editor({ input: 'icon', label: 'Icono', iconLibraries: ['lucide'] })
+        })).default([]).editor({ label: 'Datos de contacto' })
       })
     })
   }
