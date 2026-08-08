@@ -84,17 +84,23 @@ La sección Personas es **exclusivamente para miembros del Departamento**:
 profesores de jornada completa, profesores part-time, apoyos académicos y
 auxiliares de laboratorio, y administrativos. No es un directorio general.
 
-El campo `categoria` decide en qué pestaña de `/personas` aparece cada persona, y
-solo acepta cuatro valores:
+**La carpeta es la clasificación.** No hay campo `categoria`: crear una ficha
+dentro de `parttime/` la deja clasificada sin rellenar nada, y desaparece la
+posibilidad de que carpeta y campo se contradigan.
 
-| `categoria` | Pestaña |
-|---|---|
-| `jornada` | Profesores Jornada Completa |
-| `parttime` | Profesores Part-time |
-| `apoyo` | Apoyos Académicos y Auxiliares de Laboratorio |
-| `administrativos` | Administrativos |
+```
+content/personas/jornada/          Profesores Jornada Completa
+content/personas/parttime/         Profesores Part-time
+content/personas/apoyo/            Apoyos Académicos y Auxiliares de Laboratorio
+content/personas/administrativos/  Administrativos
+```
 
-`cargo` y `categoria` tienen valor por defecto a propósito. Una ficha recién
+La miga de pan lo refleja: `Inicio » Personas » Profesores Part-time » Nombre`.
+
+Las publicaciones son **una sola lista** con una casilla «destacada»; la web las
+reparte en «Publicaciones destacadas» y «Todas las publicaciones».
+
+`cargo` tiene valor por defecto a propósito. Una ficha recién
 creada aparece en la web enseguida, en la pestaña de jornada completa y con un
 cargo «por completar». Es preferible a que desaparezca sin motivo visible: Nuxt
 Content **descarta en silencio** todo fichero que no cumpla el esquema, sin error
@@ -103,12 +109,12 @@ ni aviso.
 **Si aun así una persona no aparece:**
 
 1. Falta `nombre`, que es el único campo sin valor por defecto.
-2. `categoria` tiene un valor distinto de esos cuatro.
+2. El fichero está suelto en `content/personas/` en vez de dentro de una de
+   las cuatro carpetas.
 3. Se publicó desde Studio pero el sitio no se ha recompilado todavía. Ver §5.
 
 Las etiquetas de las pestañas están en `app/utils/personas.ts`. Añadir una
-categoría nueva exige tocar ese fichero **y** el `enum` de `content.config.ts`:
-cambiar solo uno de los dos rompe el sitio.
+categoría nueva exige añadirla ahí **y** crear la carpeta correspondiente.
 
 ### 3.2. `content/paginas/*.yml` — una página por fichero
 
