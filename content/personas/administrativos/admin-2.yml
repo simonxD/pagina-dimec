@@ -1,7 +1,6 @@
 nombre: 'Nombre Apellido'
-cargo: 'Profesor de jornada parcial'
-categoria: parttime
-orden: 3
+cargo: 'Encargado de gestión'
+orden: 2
 email: 'correo@ejemplo.cl'
 foto: ''
 areas: []

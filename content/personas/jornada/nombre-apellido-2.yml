@@ -1,15 +1,16 @@
 nombre: 'Nombre Apellido'
-cargo: 'Profesor asistente'
-categoria: jornada
-orden: 4
+cargo: 'Profesor titular'
+orden: 2
 grado: 'Doctor en Ingeniería Mecánica'
 email: 'correo@ejemplo.cl'
 foto: ''
-areas: ['fluidos', 'termicos']
-intereses: ['Mecánica de fluidos computacional', 'Turbomáquinas']
+areas: ['solidos']
+intereses: ['Mecánica de sólidos', 'Fatiga', 'Elementos finitos']
 investigaciones: []
 publicaciones: []
-docencia: []
+docencia:
+  - codigo: 'IWM002'
+    nombre: 'Nombre de la asignatura'
 enlaces: []
 resena: |
   Reemplaza este párrafo por la reseña real.

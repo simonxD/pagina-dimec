@@ -1,7 +1,6 @@
 nombre: 'Nombre Apellido'
-cargo: 'Profesora de jornada parcial'
-categoria: parttime
-orden: 2
+cargo: 'Apoyo académico'
+orden: 1
 email: 'correo@ejemplo.cl'
 foto: ''
 areas: []

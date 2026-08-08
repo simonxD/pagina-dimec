@@ -8,8 +8,8 @@ const props = defineProps<{
   /** Ruta de la imagen de fondo, p. ej. '/cabeceras/docencia.jpg'.
    *  Si se omite queda el gris institucional de reserva. */
   imagen?: string
-  /** Sección contenedora, para páginas que no cuelgan del menú */
-  padre?: Miga
+  /** Sección o secciones contenedoras, para páginas que no cuelgan del menú */
+  padre?: Miga | Miga[]
 }>()
 
 const route = useRoute()

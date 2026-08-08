@@ -29,14 +29,16 @@ function padreEnElMenu(ruta: string): Miga | undefined {
  *   /personas/juan-perez → Inicio › Personas › Juan Pérez
  *   /pregrado            → Inicio › Estudios › Pregrado
  *
- * `padre` permite declararlo a mano en páginas que no cuelgan del menú.
+ * `padre` permite declararlo a mano en páginas que no cuelgan del menú. Acepta
+ * varios tramos porque la ficha de una persona necesita dos:
+ *   Inicio » Personas » Profesores Jornada Completa » Nombre Apellido
  */
-export function construirMigas(ruta: string, titulo: string, padre?: Miga): Miga[] {
+export function construirMigas(ruta: string, titulo: string, padre?: Miga | Miga[]): Miga[] {
   const migas: Miga[] = [{ label: 'Inicio', to: '/' }]
   const segmentos = ruta.split('/').filter(Boolean)
 
   if (padre) {
-    migas.push(padre)
+    migas.push(...(Array.isArray(padre) ? padre : [padre]))
   } else if (segmentos.length > 1) {
     // Ruta anidada: el primer segmento es la sección contenedora
     const rutaPadre = `/${segmentos[0]}`

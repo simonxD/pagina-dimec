@@ -24,6 +24,18 @@ useSeoMeta({
 
 // La reseña es texto corriente. Se separan párrafos por línea en blanco para no
 // obligar a nadie a escribir markdown.
+const categoria = computed(() => categoriaPersona(persona.value ?? {}))
+
+// Miga de pan: Inicio » Personas » <categoría> » <nombre>
+const migas = computed(() => [
+  { label: 'Personas', to: '/personas' },
+  { label: etiquetaCategoria(categoria.value), to: '/personas' }
+])
+
+// Una sola lista en el editor, dos secciones en la web.
+const destacadas = computed(() => (persona.value?.publicaciones ?? []).filter(p => p.destacada))
+const todasPublicaciones = computed(() => persona.value?.publicaciones ?? [])
+
 const parrafos = computed(() =>
   String(persona.value?.resena ?? '').split(/\n\s*\n/).map(p => p.trim()).filter(Boolean)
 )
@@ -35,14 +47,14 @@ const susAreas = computed(() =>
 
 <template>
   <div v-if="persona">
-    <CabeceraPagina :titulo="persona.nombre" />
+    <CabeceraPagina :titulo="persona.nombre" :padre="migas" />
 
     <div class="mx-auto w-full max-w-[1200px] px-5 py-10 lg:px-2.5">
-      <div class="grid gap-10 lg:grid-cols-[280px_1fr]">
+      <div class="grid gap-10 lg:grid-cols-[280px_minmax(0,1fr)]">
         <!-- ── Columna izquierda: identidad y contacto ── -->
         <aside class="space-y-6">
           <div
-            class="h-[280px] rounded-[10px] bg-usm-nav bg-cover bg-center"
+            class="h-[322px] rounded-[10px] bg-usm-nav bg-cover bg-center"
             :style="persona.foto ? { backgroundImage: `url('${persona.foto}')` } : undefined"
           />
 
@@ -52,17 +64,16 @@ const susAreas = computed(() =>
           </div>
 
           <dl class="space-y-3 text-sm">
-            <div v-if="persona.email">
-              <dt class="text-xs font-semibold uppercase tracking-wide text-slate-600">Correo</dt>
-              <dd class="mt-0.5">
-                <a :href="`mailto:${persona.email}`" class="text-usm hover:underline">
+            <!-- Correo y teléfono comparten encabezado: son la misma cosa para
+                 quien lee, y separarlos repetía dos rótulos casi vacíos. -->
+            <div v-if="persona.email || persona.telefono">
+              <dt class="text-xs font-semibold uppercase tracking-wide text-slate-600">Contacto</dt>
+              <dd v-if="persona.email" class="mt-0.5">
+                <a :href="`mailto:${persona.email}`" class="break-all text-usm hover:underline">
                   {{ persona.email }}
                 </a>
               </dd>
-            </div>
-            <div v-if="persona.telefono">
-              <dt class="text-xs font-semibold uppercase tracking-wide text-slate-600">Teléfono</dt>
-              <dd class="mt-0.5 text-muted">{{ persona.telefono }}</dd>
+              <dd v-if="persona.telefono" class="mt-0.5 text-muted">{{ persona.telefono }}</dd>
             </div>
             <div v-if="persona.oficina">
               <dt class="text-xs font-semibold uppercase tracking-wide text-slate-600">Oficina</dt>
@@ -78,18 +89,6 @@ const susAreas = computed(() =>
             </div>
           </dl>
 
-          <div v-if="persona.enlaces?.length" class="flex flex-wrap gap-2">
-            <a
-              v-for="e in persona.enlaces"
-              :key="e.url"
-              :href="e.url"
-              target="_blank"
-              class="rounded border border-default px-3 py-1.5 text-sm text-usm
-                     transition-colors hover:bg-usm hover:text-white"
-            >
-              {{ e.label }}
-            </a>
-          </div>
 
           <div v-if="susAreas.length">
             <p class="text-xs font-semibold uppercase tracking-wide text-slate-600">
@@ -105,7 +104,7 @@ const susAreas = computed(() =>
         </aside>
 
         <!-- ── Columna derecha: contenido ── -->
-        <div class="space-y-12">
+        <div class="min-w-0 space-y-12">
           <section v-if="parrafos.length">
             <h2 class="text-2xl font-semibold">Acerca de</h2>
             <div class="mt-4 space-y-4 text-muted leading-relaxed">
@@ -114,7 +113,7 @@ const susAreas = computed(() =>
           </section>
 
           <section v-if="persona.intereses?.length">
-            <h2 class="text-2xl font-semibold">Intereses de investigación</h2>
+            <h2 class="text-2xl font-semibold">Intereses</h2>
             <ul class="mt-4 flex flex-wrap gap-2">
               <li
                 v-for="i in persona.intereses"
@@ -148,16 +147,33 @@ const susAreas = computed(() =>
             </div>
           </section>
 
-          <section v-if="persona.publicaciones?.length">
-            <h2 class="text-2xl font-semibold">Publicaciones recientes</h2>
+          <section v-if="destacadas.length">
+            <h2 class="text-2xl font-semibold">Publicaciones destacadas</h2>
             <ul class="mt-4 border-t border-default">
               <li
-                v-for="p in persona.publicaciones"
+                v-for="p in destacadas"
+                :key="'d' + p.titulo + p.anio"
+                class="flex gap-5 border-b border-default py-4"
+              >
+                <span class="w-12 shrink-0 text-sm font-bold text-usm">{{ p.anio }}</span>
+                <span class="min-w-0 text-sm">
+                  <span class="text-usm-nav">{{ p.titulo }}</span>
+                  <span class="text-muted"> · {{ p.medio }}</span>
+                </span>
+              </li>
+            </ul>
+          </section>
+
+          <section v-if="todasPublicaciones.length">
+            <h2 class="text-2xl font-semibold">Todas las publicaciones</h2>
+            <ul class="mt-4 border-t border-default">
+              <li
+                v-for="p in todasPublicaciones"
                 :key="p.titulo + p.anio"
                 class="flex gap-5 border-b border-default py-4"
               >
                 <span class="w-12 shrink-0 text-sm font-bold text-usm">{{ p.anio }}</span>
-                <span class="text-sm">
+                <span class="min-w-0 text-sm">
                   <span class="text-usm-nav">{{ p.titulo }}</span>
                   <span class="text-muted"> · {{ p.medio }}</span>
                 </span>

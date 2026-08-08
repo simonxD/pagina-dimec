@@ -70,7 +70,11 @@ export default defineContentConfig({
       // Se aceptan las tres extensiones de datos porque el desplegable de
       // formato de Studio no distingue por coleccion. Si solo valiera .yml,
       // elegir otra crearia un fichero que el sitio ignora en silencio.
-      source: 'personas/*.{yml,yaml,json}',
+      // Una subcarpeta por categoria. La carpeta ES la clasificacion: crear una
+      // ficha dentro de `parttime` la deja clasificada como profesor part-time
+      // sin que haya que rellenar ningun campo, y no existe la posibilidad de
+      // que carpeta y campo se contradigan.
+      source: 'personas/**/*.{yml,yaml,json}',
       schema: z.object({
         nombre: linea('Nombre', 'Nombre y apellidos, tal como deben verse en la web'),
 
@@ -80,9 +84,6 @@ export default defineContentConfig({
         // que no cumple el esquema, sin error ni aviso.
         cargo: z.string().default('Cargo por completar')
           .editor({ label: 'Cargo', description: 'Ejemplo: Profesora asociada' }),
-        categoria: z.enum(['jornada', 'parttime', 'apoyo', 'administrativos'])
-          .default('jornada')
-          .editor({ label: 'Categoría', description: 'Decide en qué pestaña de Personas aparece' }),
         orden: z.number().default(100)
           .editor({ label: 'Orden', description: 'Posición dentro de su pestaña. El número más bajo aparece primero' }),
 
@@ -100,7 +101,7 @@ export default defineContentConfig({
         areas: z.array(z.string()).default([])
           .editor({ label: 'Áreas del Departamento', description: 'Identificadores de app/utils/areas.ts. Ejemplo: termicos' }),
         intereses: z.array(z.string()).default([])
-          .editor({ label: 'Intereses de investigación', description: 'Uno por elemento' }),
+          .editor({ label: 'Intereses', description: 'Uno por elemento. Ejemplo: Combustión' }),
 
         investigaciones: z.array(z.object({
           titulo: linea('Título'),
@@ -108,28 +109,32 @@ export default defineContentConfig({
           url: z.string().optional().editor({ label: 'Enlace' })
         })).default([]).editor({ label: 'Investigaciones destacadas' }),
 
+        // Una sola lista de publicaciones, con una casilla para destacar.
+        //
+        // Se descarto tener dos listas separadas: obligaria a escribir la misma
+        // publicacion dos veces para que apareciera en ambos sitios, o a moverla
+        // de lista a mano. Con la casilla, la web las reparte sola.
         publicaciones: z.array(z.object({
           titulo: linea('Título'),
           medio: linea('Publicado en', 'Revista, congreso o editorial'),
           anio: z.number().editor({ label: 'Año' }),
-          url: z.string().optional().editor({ label: 'Enlace' })
-        })).default([]).editor({ label: 'Publicaciones recientes' }),
+          url: z.string().optional().editor({ label: 'Enlace' }),
+          destacada: z.boolean().default(false).editor({
+            label: '¿Destacada?',
+            description: 'Marcada, aparece arriba en "Publicaciones destacadas". Sin marcar, solo en el listado completo'
+          })
+        })).default([]).editor({ label: 'Publicaciones' }),
 
         docencia: z.array(z.object({
           codigo: linea('Código', 'Ejemplo: IWM101'),
           nombre: linea('Asignatura')
         })).default([]).editor({ label: 'Docencia' }),
 
-        enlaces: z.array(z.object({
-          label: linea('Nombre del enlace', 'Ejemplo: ORCID'),
-          url: linea('Dirección')
-        })).default([]).editor({ label: 'Enlaces externos' }),
-
         resena: z.string().default('')
           .editor({
             input: 'textarea',
             label: 'Acerca de',
-            description: 'Reseña que aparece en su ficha. Deja una línea en blanco entre párrafos'
+            description: 'Deja una línea en blanco entre párrafos'
           })
       })
     }),
@@ -164,28 +169,11 @@ export default defineContentConfig({
     //
     // Inicio no esta aqui: se dejo fuera de la edicion a peticion expresa.
     // ─────────────────────────────────────────────────────────────────────
-    // Prueba piloto de edicion con texto enriquecido.
-    //
-    // Es la unica pagina de tipo `page` en vez de `data`, y la diferencia es que
-    // tiene cuerpo markdown. Ese cuerpo es lo unico que Studio edita con el
-    // editor visual: negritas, listas, encabezados y enlaces. Los campos de
-    // formulario no admiten nada de eso, se comprobo en el codigo del modulo.
-    //
-    // Los datos estructurados -periodos, cargos, tarjetas- siguen en el
-    // frontmatter, porque son tablas y no prosa: convertirlos en markdown
-    // significaria que la maquetacion la decide el texto y no el diseño.
-    //
-    // Los campos que Nuxt Content inyecta en las colecciones `page` se declaran
-    // aqui solo para ocultarlos: sin esto el formulario enseña Title, SEO y
-    // Navigation, que no significan nada para quien mantiene el contenido. El
-    // titulo y la descripcion de la pagina se fijan en el .vue.
     departamento: defineCollection({
-      type: 'page',
-      source: 'paginas/departamento.md',
+      type: 'data',
+      source: 'paginas/departamento.yml',
       schema: z.object({
-        title: z.string().optional().editor({ hidden: true }),
-        description: z.string().optional().editor({ hidden: true }),
-        navigation: z.boolean().default(false).editor({ hidden: true }),
+        intro: parrafo('Texto de entrada', 'Párrafo que abre la página, debajo del título'),
         valores: z.array(z.object({
           titulo: linea('Título de la tarjeta', 'Misión, Visión...'),
           texto: parrafo('Contenido')

@@ -24,18 +24,9 @@ const historia = computed(() => pagina.value?.historia ?? [])
     <CabeceraPagina titulo="Departamento" />
 
     <div class="mx-auto w-full max-w-[1200px] px-5 py-10 lg:px-2.5">
-      <!-- El texto de entrada es el cuerpo markdown del fichero, no un campo:
-           así se edita con negritas, listas y enlaces desde /_studio. Las
-           clases replican el estilo que tenía el párrafo fijo, para que el
-           resultado se vea igual mientras el texto sea un párrafo simple. -->
-      <div
-        v-if="pagina"
-        class="mb-10 text-lg text-muted [&_a]:text-usm [&_a]:underline [&_li]:ml-5
-               [&_li]:list-disc [&_p]:mb-4 [&_strong]:font-semibold [&_strong]:text-usm-nav
-               [&_ul]:mb-4"
-      >
-        <ContentRenderer :value="pagina" />
-      </div>
+      <p class="text-lg text-muted mb-10">
+        {{ pagina?.intro }}
+      </p>
 
       <section id="mision" class="scroll-mt-24">
         <UPageGrid>

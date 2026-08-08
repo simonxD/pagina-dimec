@@ -1,7 +1,6 @@
 nombre: 'Nombre Apellido'
-cargo: 'Apoyo académico'
-categoria: apoyo
-orden: 1
+cargo: 'Auxiliar de laboratorio'
+orden: 2
 email: 'correo@ejemplo.cl'
 foto: ''
 areas: []

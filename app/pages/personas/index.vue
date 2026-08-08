@@ -11,8 +11,9 @@ const { data: todas } = await useAsyncData('personas', () =>
 
 const activa = ref<string>('jornada')
 
+// La categoría sale de la carpeta del fichero, no de un campo.
 const visibles = computed(() =>
-  (todas.value ?? []).filter(p => p.categoria === activa.value)
+  (todas.value ?? []).filter(p => categoriaPersona(p) === activa.value)
 )
 
 // Desplegable de la versión móvil

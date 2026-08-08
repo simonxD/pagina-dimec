@@ -1,6 +1,5 @@
 nombre: 'Nombre Apellido'
 cargo: 'Profesora asistente'
-categoria: jornada
 orden: 5
 grado: 'Doctora en Ingeniería Mecánica'
 email: 'correo@ejemplo.cl'

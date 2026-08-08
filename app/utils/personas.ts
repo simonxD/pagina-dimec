@@ -26,8 +26,28 @@ export const categorias = [
 export function slugPersona(stem: string | undefined): string {
   return String(stem ?? '').split('/').pop()!
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[̀-ͯ]/g, '')       // quita las tildes
     .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')  // espacios y signos pasan a guion
+    .replace(/^-+|-+$/g, '')
+}
+
+/**
+ * Categoría de una persona, deducida de la carpeta donde vive su ficha.
+ *
+ * La carpeta ES la clasificación, y por eso no hay un campo `categoria` en el
+ * esquema: crear una ficha dentro de `parttime` la deja clasificada sin
+ * rellenar nada, y no puede darse el caso de que carpeta y campo se
+ * contradigan. El `stem` llega como `personas/parttime/nombre-apellido`.
+ */
+export function categoriaPersona(persona: { stem?: string }): string {
+  const partes = String(persona.stem ?? '').split('/')
+  const carpeta = partes[partes.length - 2] ?? ''
+  return categorias.some(c => c.id === carpeta) ? carpeta : 'jornada'
+}
+
+export function etiquetaCategoria(id: string): string {
+  return categorias.find(c => c.id === id)?.label ?? ''
 }
 
 export function rutaPersona(persona: { stem?: string }): string {

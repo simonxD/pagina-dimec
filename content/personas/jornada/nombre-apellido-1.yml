@@ -1,6 +1,5 @@
 nombre: 'Nombre Apellido'
 cargo: 'Director del Departamento'
-categoria: jornada
 orden: 1
 grado: 'Doctor en Ingeniería Mecánica'
 email: 'correo@ejemplo.cl'
@@ -27,11 +26,6 @@ docencia:
     nombre: 'Nombre de la asignatura'
   - codigo: 'IWM001'
     nombre: 'Nombre de la asignatura'
-enlaces:
-  - label: 'ORCID'
-    url: 'https://orcid.org/'
-  - label: 'Google Scholar'
-    url: 'https://scholar.google.com/'
 resena: |
   Reemplaza este párrafo por la reseña real: formación, trayectoria y línea de trabajo actual.
   
