@@ -1,6 +1,10 @@
 <script setup lang="ts">
-// Carrusel de publicaciones de LinkedIn.
-// Los datos viven en app/utils/publicaciones.ts
+// Carrusel de noticias. El contenido vive en content/noticias/*.md y se edita
+// desde nuxt.studio; los perfiles de cada red, en app/utils/publicaciones.ts
+
+const { data: publicaciones } = await useAsyncData('noticias', () =>
+  queryCollection('noticias').order('fecha', 'DESC').all()
+)
 
 const pista = ref<HTMLElement | null>(null)
 const alInicio = ref(true)
@@ -39,7 +43,7 @@ const formatoFecha = new Intl.DateTimeFormat('es-CL', {
   year: 'numeric'
 })
 
-const fechaLegible = (iso: string) => formatoFecha.format(new Date(`${iso}T12:00:00`))
+const fechaLegible = (fecha: string | Date) => formatoFecha.format(new Date(fecha))
 </script>
 
 <template>
@@ -88,8 +92,8 @@ const fechaLegible = (iso: string) => formatoFecha.format(new Date(`${iso}T12:00
                [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         <li
-          v-for="p in publicaciones"
-          :key="p.url + p.fecha"
+          v-for="p in publicaciones ?? []"
+          :key="p.path"
           class="w-[280px] shrink-0 snap-start sm:w-[360px] lg:w-[380px]"
         >
           <a
@@ -117,7 +121,7 @@ const fechaLegible = (iso: string) => formatoFecha.format(new Date(`${iso}T12:00
                 {{ fechaLegible(p.fecha) }}
               </p>
               <p class="mt-2 line-clamp-4 text-sm text-usm-nav">
-                {{ p.texto }}
+                {{ p.titulo }}
               </p>
               <span
                 class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-usm
