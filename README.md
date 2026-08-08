@@ -297,7 +297,39 @@ GitHub:    https://dimec.pollomongoliano.cc/__nuxt_studio/auth/github
 **La autoría en git se pierde con la puerta de Microsoft**: todos los commits
 llevan la firma del dueño del `STUDIO_GITHUB_TOKEN`, no de quien editó.
 
-### 4.5. Permisos por usuario (pendiente)
+### 4.5. Lo que NO se puede personalizar del editor
+
+Conviene saberlo antes de intentarlo, porque se pierde tiempo buscando la opción.
+
+**El selector de formato al crear un archivo** (md / yaml / yml / json) no se
+puede quitar ni limitar. La lista está incrustada en el código compilado del
+editor:
+
+```js
+var wO = (e => (e.Markdown="md", e.YAML="yaml", e.YML="yml", e.JSON="json", e))(wO||{})
+```
+
+No se deriva de la configuración de las colecciones. Mitigación aplicada: la
+colección `personas` acepta `.yml`, `.yaml` **y** `.json`, así que solo falla la
+opción `md` — que por desgracia es la marcada por defecto. Hay un aviso en la
+página `/entrar`.
+
+**Los textos de los botones** («Nuevo archivo», «Publicar») tampoco se pueden
+cambiar por otros propios: viven en los ficheros de idioma del paquete. Lo que sí
+se hizo es activar el español con `studio.i18n.defaultLocale`, porque el módulo
+trae la traducción completa y por defecto sale en inglés.
+
+Parchear el paquete en `node_modules` funcionaría, pero se perdería en cada
+`bun install` y rompería en cada actualización. No se ha hecho.
+
+**El endpoint `/__nuxt_studio/auth/session` devuelve el `accessToken` de la
+sesión** a quien esté identificado. Con la puerta de cuentas propias eso es el
+`STUDIO_GITHUB_TOKEN` del servidor: cualquier editor puede extraerlo. Es diseño
+del módulo. Por eso el token debe tener el alcance mínimo (`public_repo`, o
+*fine-grained* limitado a este repositorio) y por eso importa quién está en la
+lista de editores.
+
+### 4.6. Permisos por usuario (pendiente)
 
 Está previsto dar acceso a profesores para editar **solo su propia ficha**, y a
 otras personas para editar las páginas generales.

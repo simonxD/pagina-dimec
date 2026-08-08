@@ -11,6 +11,24 @@ useSeoMeta({
   robots: 'noindex, nofollow'
 })
 
+// Si ya hay sesión abierta, esta página no tiene sentido: manda al inicio, donde
+// aparece el editor. La cookie de sesión es httpOnly y no se puede leer desde el
+// navegador, así que hay que preguntárselo al servidor. useRequestFetch reenvía
+// las cookies de la petición original, que es lo que hace que funcione también
+// durante el renderizado en servidor.
+// El endpoint responde { user: { email, ... }, id }. El identificador viene
+// siempre, tenga o no sesión: lo que distingue a alguien identificado es que
+// exista `user`.
+const peticion = useRequestFetch()
+const { data: sesion } = await useAsyncData('sesion-studio', () =>
+  peticion<{ user?: { email?: string } }>('/__nuxt_studio/auth/session')
+    .catch(() => null)
+)
+
+if (sesion.value?.user?.email) {
+  await navigateTo('/', { replace: true })
+}
+
 const usuario = ref('')
 const contrasena = ref('')
 const error = ref('')
@@ -76,6 +94,47 @@ async function entrar() {
         Entrar
       </UButton>
     </form>
+
+    <!-- Cuatro cosas que evitan la mayoría de los tropiezos. La primera existe
+         porque el selector de formato del editor no se puede quitar: viene fijo
+         en Studio y su opción por defecto, md, es justo la que no funciona. -->
+    <section class="mt-10 border-t border-default pt-6">
+      <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-600">
+        Antes de empezar
+      </h2>
+      <ul class="mt-4 space-y-3 text-sm text-muted">
+        <li class="flex gap-2.5">
+          <UIcon name="i-lucide-triangle-alert" class="mt-0.5 size-4 shrink-0 text-usm" />
+          <span>
+            Al crear una persona, en el selector de formato elige
+            <strong class="text-usm-nav">yml</strong>. La opción <em>md</em> que
+            viene marcada por defecto no sirve, y el error no se avisa.
+          </span>
+        </li>
+        <li class="flex gap-2.5">
+          <UIcon name="i-lucide-link" class="mt-0.5 size-4 shrink-0 text-usm" />
+          <span>
+            El nombre del archivo forma la dirección web de esa persona. Usa
+            algo como <code class="text-usm-nav">nombre-apellido</code>.
+          </span>
+        </li>
+        <li class="flex gap-2.5">
+          <UIcon name="i-lucide-check" class="mt-0.5 size-4 shrink-0 text-usm" />
+          <span>
+            Rellena <strong class="text-usm-nav">Nombre</strong> y
+            <strong class="text-usm-nav">Categoría</strong>: deciden si aparece
+            y en qué pestaña.
+          </span>
+        </li>
+        <li class="flex gap-2.5">
+          <UIcon name="i-lucide-clock" class="mt-0.5 size-4 shrink-0 text-usm" />
+          <span>
+            Tras publicar, el sitio tarda unos minutos en actualizarse. Es
+            normal.
+          </span>
+        </li>
+      </ul>
+    </section>
 
     <p class="mt-8 border-t border-default pt-5 text-sm text-muted">
       ¿Olvidaste la contraseña? No hay recuperación automática: pídele a quien

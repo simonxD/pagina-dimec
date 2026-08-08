@@ -31,6 +31,11 @@ export default defineNuxtConfig({
     // maquetando: bloques de codigo, lineas horizontales, video incrustado e
     // insercion de componentes Vue. Dejarlas visibles invita a romper el
     // formato del sitio sin darse cuenta.
+    // El editor lo usa gente del Departamento, en espanol. El modulo trae los
+    // textos traducidos; sin esto sale en ingles ("New file", "Page settings").
+    i18n: {
+      defaultLocale: 'es'
+    },
     editor: {
       commands: {
         exclude: ['codeBlock', 'code', 'horizontalRule', 'video', 'style', 'insert']

@@ -54,7 +54,20 @@ export default defineContentConfig({
       // de aqui abajo, y el fichero es siempre .yml. El SEO se sigue generando,
       // pero desde el codigo a partir del nombre y el cargo.
       type: 'data',
-      source: 'personas/*.yml',
+      // Se aceptan las tres extensiones de datos, no solo .yml, aunque lo normal
+      // sea usar .yml.
+      //
+      // Al crear una ficha, Studio pregunta el formato con un desplegable
+      // (md / yaml / yml / json) que NO se puede quitar ni configurar: la lista
+      // esta incrustada en el codigo compilado del editor. Si la coleccion solo
+      // aceptara .yml, elegir "yaml" o "json" crearia un fichero que el sitio
+      // ignora en silencio, sin error y sin pista de por que esa persona no
+      // aparece. Aceptando las tres, cualquier eleccion razonable funciona.
+      //
+      // La unica que sigue sin servir es "md", que es ademas la opcion por
+      // defecto del desplegable: un markdown no encaja en una coleccion de
+      // datos. Esta avisado en el README y en la pagina de entrada.
+      source: 'personas/*.{yml,yaml,json}',
       schema: z.object({
         nombre: z.string().describe('Nombre y apellidos, tal como debe aparecer en la web'),
 
