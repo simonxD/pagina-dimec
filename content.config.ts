@@ -40,20 +40,28 @@ export default defineContentConfig({
     // forma de separar quien puede tocar que.
     // ─────────────────────────────────────────────────────────────────────
     personas: defineCollection({
-      type: 'page',
-      source: 'personas/*.md',
+      // `data` y no `page`. La diferencia decide como se ve el editor.
+      //
+      // Una coleccion `page` arrastra un esquema propio de Nuxt Content con
+      // title, description, seo, navigation, body, extension y path, y Studio
+      // los muestra todos. En la practica eso obligaba a escribir el nombre de
+      // la persona tres veces (Title, Title de SEO y el campo propio), mostraba
+      // un bloque SEO que no significa nada para quien no es tecnico, abria un
+      // editor de markdown aparte para el cuerpo, y al crear una ficha preguntaba
+      // si se queria en md, yaml, json, csv o xml.
+      //
+      // Con `data` no se hereda nada: el formulario tiene exactamente los campos
+      // de aqui abajo, y el fichero es siempre .yml. El SEO se sigue generando,
+      // pero desde el codigo a partir del nombre y el cargo.
+      type: 'data',
+      source: 'personas/*.yml',
       schema: z.object({
-        // El nombre va en `title`, no en un campo propio, porque es lo unico que
-        // Studio rellena al crear una ficha nueva. Con un campo `nombre` aparte,
-        // toda persona creada desde el editor nacia sin el, no pasaba la
-        // validacion del esquema y Nuxt Content la descartaba en silencio: no
-        // salia en la web y no habia ningun error que lo explicara.
-        title: z.string().describe('Nombre y apellidos, tal como debe aparecer en la web'),
+        nombre: z.string().describe('Nombre y apellidos, tal como debe aparecer en la web'),
 
-        // Por la misma razon, los demas campos obligatorios llevan un valor por
-        // defecto. Una ficha recien creada se ve en la web enseguida, con textos
-        // evidentes de completar. Es preferible a que desaparezca sin motivo
-        // visible: el error se ve y se arregla, en vez de tener que deducirlo.
+        // Los campos obligatorios llevan valor por defecto para que una ficha
+        // recien creada se vea en la web enseguida, con textos evidentes de
+        // completar. Es preferible a que desaparezca sin motivo visible: Nuxt
+        // Content descarta en silencio lo que no cumple el esquema, sin error.
         cargo: z.string().default('Cargo por completar')
           .describe('Cargo o titulo. Ejemplo: Profesor titular'),
         categoria: z.enum(['jornada', 'parttime', 'apoyo', 'administrativos'])
@@ -90,7 +98,13 @@ export default defineContentConfig({
         enlaces: z.array(z.object({
           label: z.string(),
           url: z.string()
-        })).default([]).describe('Enlaces externos: ORCID, Google Scholar, LinkedIn...')
+        })).default([]).describe('Enlaces externos: ORCID, Google Scholar, LinkedIn...'),
+
+        // Sustituye al cuerpo markdown que tenia la coleccion cuando era `page`.
+        // Es texto corriente: se separan parrafos dejando una linea en blanco, y
+        // no hace falta saber markdown para escribirlo.
+        resena: z.string().default('')
+          .describe('Texto que aparece en "Acerca de". Deja una linea en blanco entre parrafos')
       })
     }),
 

@@ -1,5 +1,4 @@
----
-title: 'Nombre Apellido'
+nombre: 'Nombre Apellido'
 cargo: 'Profesora asociada'
 categoria: jornada
 orden: 3
@@ -12,6 +11,5 @@ investigaciones: []
 publicaciones: []
 docencia: []
 enlaces: []
----
-
-Reemplaza este párrafo por la reseña real.
+resena: |
+  Reemplaza este párrafo por la reseña real.

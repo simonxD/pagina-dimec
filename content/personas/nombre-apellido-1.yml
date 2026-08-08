@@ -1,5 +1,4 @@
----
-title: 'Nombre Apellido'
+nombre: 'Nombre Apellido'
 cargo: 'Director del Departamento'
 categoria: jornada
 orden: 1
@@ -33,8 +32,7 @@ enlaces:
     url: 'https://orcid.org/'
   - label: 'Google Scholar'
     url: 'https://scholar.google.com/'
----
-
-Reemplaza este párrafo por la reseña real: formación, trayectoria y línea de trabajo actual.
-
-Un segundo párrafo puede detallar proyectos en curso, colaboraciones y responsabilidades en el Departamento.
+resena: |
+  Reemplaza este párrafo por la reseña real: formación, trayectoria y línea de trabajo actual.
+  
+  Un segundo párrafo puede detallar proyectos en curso, colaboraciones y responsabilidades en el Departamento.

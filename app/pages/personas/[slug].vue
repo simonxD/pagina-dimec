@@ -1,19 +1,32 @@
 <script setup lang="ts">
 const route = useRoute()
 
-// La ficha vive en content/personas/<slug>.md
-const { data: persona } = await useAsyncData(`persona-${route.path}`, () =>
-  queryCollection('personas').path(route.path).first()
-)
+// La ficha vive en content/personas/<fichero>.yml. Al ser una colección `data`
+// no hay `path` generado, así que se busca comparando el nombre del fichero ya
+// normalizado: así "simón-ramos.yml" responde en /personas/simon-ramos.
+const slug = String(route.params.slug)
+
+const { data: persona } = await useAsyncData(`persona-${slug}`, async () => {
+  const todas = await queryCollection('personas').all()
+  return todas.find(p => slugPersona(p.stem) === slug) ?? null
+})
 
 if (!persona.value) {
   throw createError({ statusCode: 404, statusMessage: 'Persona no encontrada', fatal: true })
 }
 
+// El SEO se arma aquí, no en el editor: quien mantiene el contenido no tiene por
+// qué saber qué es, y con el nombre y el cargo ya sale bien.
 useSeoMeta({
-  title: persona.value.title,
+  title: persona.value.nombre,
   description: `${persona.value.cargo} · Departamento de Ingeniería Mecánica USM`
 })
+
+// La reseña es texto corriente. Se separan párrafos por línea en blanco para no
+// obligar a nadie a escribir markdown.
+const parrafos = computed(() =>
+  String(persona.value?.resena ?? '').split(/\n\s*\n/).map(p => p.trim()).filter(Boolean)
+)
 
 const susAreas = computed(() =>
   areas.filter(a => persona.value?.areas?.includes(a.id))
@@ -22,7 +35,7 @@ const susAreas = computed(() =>
 
 <template>
   <div v-if="persona">
-    <CabeceraPagina :titulo="persona.title" />
+    <CabeceraPagina :titulo="persona.nombre" />
 
     <div class="mx-auto w-full max-w-[1200px] px-5 py-10 lg:px-2.5">
       <div class="grid gap-10 lg:grid-cols-[280px_1fr]">
@@ -93,10 +106,10 @@ const susAreas = computed(() =>
 
         <!-- ── Columna derecha: contenido ── -->
         <div class="space-y-12">
-          <section v-if="persona.body">
+          <section v-if="parrafos.length">
             <h2 class="text-2xl font-semibold">Acerca de</h2>
-            <div class="mt-4 space-y-4 text-muted leading-relaxed [&_p]:mb-4">
-              <ContentRenderer :value="persona" />
+            <div class="mt-4 space-y-4 text-muted leading-relaxed">
+              <p v-for="(p, i) in parrafos" :key="i" class="mb-4">{{ p }}</p>
             </div>
           </section>
 

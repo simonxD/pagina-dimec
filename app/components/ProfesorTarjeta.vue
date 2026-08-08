@@ -21,7 +21,7 @@ const degradado = 'linear-gradient(0deg, rgb(0,0,0) 0px, rgba(0,0,0,0) 90%)'
 
 <template>
   <NuxtLink
-    :to="persona.path"
+    :to="rutaPersona(persona)"
     class="group relative block h-[260px] overflow-hidden rounded-[10px] bg-usm-nav bg-cover
            bg-center shadow-[0_0_10px_0_rgba(0,0,0,0.4)]"
     :style="estiloFoto"
@@ -39,7 +39,7 @@ const degradado = 'linear-gradient(0deg, rgb(0,0,0) 0px, rgba(0,0,0,0) 90%)'
       :class="tieneAreas && 'pb-[62px]'"
     >
       <h2 class="border-l-[3px] border-usm-dorado pl-[1em] text-[18px] font-semibold text-white">
-        {{ persona.title }}
+        {{ persona.nombre }}
       </h2>
       <p class="mt-1 text-sm text-white">{{ persona.cargo }}</p>
     </div>
@@ -57,7 +57,7 @@ const degradado = 'linear-gradient(0deg, rgb(0,0,0) 0px, rgba(0,0,0,0) 90%)'
            lectores de pantalla para no anunciarlos dos veces por tarjeta. -->
       <div aria-hidden="true">
         <p class="border-l-[3px] border-usm-dorado pl-[1em] text-[18px] font-semibold text-white">
-          {{ persona.title }}
+          {{ persona.nombre }}
         </p>
         <p class="mt-1 text-sm font-bold text-white">{{ persona.cargo }}</p>
       </div>

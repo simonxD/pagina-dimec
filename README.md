@@ -60,8 +60,25 @@ app/         ← código. No editable desde Studio.
 
 ### 3.1. `content/personas/` — una persona por fichero
 
-Markdown con frontmatter. Cada fichero es una persona del Departamento y genera
-su página en `/personas/<nombre-del-fichero>`.
+Un `.yml` por persona. Cada fichero genera su página en
+`/personas/<nombre-del-fichero>`, sin tildes: `simón-ramos.yml` responde en
+`/personas/simon-ramos`.
+
+**La colección es de tipo `data`, no `page`, y la diferencia es deliberada.** Una
+colección `page` arrastra un esquema propio de Nuxt Content —`title`,
+`description`, `seo`, `navigation`, `body`, `extension`, `path`— y Studio los
+muestra todos. En la práctica eso obligaba a escribir el nombre de la persona
+tres veces (Title, Title de SEO y el campo propio), enseñaba un bloque SEO que no
+significa nada para quien no es técnico, abría un editor de markdown aparte para
+el cuerpo, y al crear una ficha preguntaba si se quería en md, yaml, json, csv o
+xml.
+
+Con `data` no se hereda nada: el formulario tiene exactamente los campos del
+esquema y el fichero es siempre `.yml`. **El SEO se sigue generando**, pero desde
+`app/pages/personas/[slug].vue`, a partir del nombre y el cargo.
+
+El texto de «Acerca de» es el campo `resena`: texto corriente, con los párrafos
+separados por una línea en blanco. No hace falta saber markdown.
 
 La sección Personas es **exclusivamente para miembros del Departamento**:
 profesores de jornada completa, profesores part-time, apoyos académicos y
@@ -77,22 +94,16 @@ solo acepta cuatro valores:
 | `apoyo` | Apoyos Académicos y Auxiliares de Laboratorio |
 | `administrativos` | Administrativos |
 
-El nombre de la persona va en el campo `title`, no en un campo `nombre` propio.
-Esto es deliberado: `title` es lo único que Studio rellena al crear una ficha
-nueva. Con un campo aparte, toda persona creada desde el editor nacía sin él, no
-pasaba la validación del esquema y Nuxt Content **la descartaba en silencio** — no
-salía en la web y no había ningún error que lo explicara.
-
-Por la misma razón, `cargo` y `categoria` tienen valor por defecto. Una ficha
-recién creada aparece en la web enseguida, en la pestaña de jornada completa y con
-un cargo «por completar». Es preferible a que desaparezca sin motivo visible: así
-el error se ve y se corrige.
+`cargo` y `categoria` tienen valor por defecto a propósito. Una ficha recién
+creada aparece en la web enseguida, en la pestaña de jornada completa y con un
+cargo «por completar». Es preferible a que desaparezca sin motivo visible: Nuxt
+Content **descarta en silencio** todo fichero que no cumpla el esquema, sin error
+ni aviso.
 
 **Si aun así una persona no aparece:**
 
-1. `categoria` tiene un valor distinto de esos cuatro. Nuxt Content valida cada
-   fichero contra el esquema y descarta en silencio los que no cumplen.
-2. Falta `title`, que es el único campo sin valor por defecto.
+1. Falta `nombre`, que es el único campo sin valor por defecto.
+2. `categoria` tiene un valor distinto de esos cuatro.
 3. Se publicó desde Studio pero el sitio no se ha recompilado todavía. Ver §5.
 
 Las etiquetas de las pestañas están en `app/utils/personas.ts`. Añadir una
@@ -158,7 +169,15 @@ publicar hace *commit* contra el repositorio de GitHub.
 
 ### 4.2. Entrar
 
-`https://dimec.pollomongoliano.cc/_studio` → login con GitHub.
+```
+Editores:    https://dimec.pollomongoliano.cc/api/entrar/microsoft
+Mantenedor:  https://dimec.pollomongoliano.cc/_studio
+```
+
+La primera usa la cuenta institucional `usm.cl` y **no requiere cuenta de
+GitHub**. La segunda es OAuth de GitHub y existe para quien administra el
+repositorio. Ambas dejan la misma sesión y abren el mismo editor: tras entrar, la
+interfaz de Studio aparece sobre el propio sitio. Detalle en §4.4.
 
 ### 4.3. Configuración
 
@@ -173,42 +192,90 @@ En `nuxt.config.ts`, bloque `studio`:
   horizontales, vídeo, inserción de componentes) y el selector de iconos se limita
   a `lucide`, que es la familia que usa el sitio.
 
-### 4.4. Credenciales
+### 4.4. Quién entra, y cómo
+
+Hay **dos puertas**, y responden a necesidades distintas.
+
+#### a) Cuenta institucional Microsoft — para los editores
+
+```
+https://dimec.pollomongoliano.cc/api/entrar/microsoft
+```
+
+Es la puerta normal. El editor entra con su correo `usm.cl` y **no necesita
+cuenta de GitHub**: los cambios se publican con un token del servidor
+(`STUDIO_GITHUB_TOKEN`), que el módulo adjunta a la sesión.
+
+La ruta es propia (`server/api/entrar/microsoft.get.ts`) y no el proveedor SSO
+que trae nuxt-studio, por dos razones concretas:
+
+1. Ese proveedor tiene las direcciones OIDC fijas como `<servidor>/oauth/authorize`,
+   `/oauth/token` y `/oauth/userinfo`. Entra ID usa `/oauth2/v2.0/authorize` y
+   sirve el perfil desde `graph.microsoft.com`, otro dominio. No encajan.
+2. Ese proveedor **no tiene lista de permitidos**. Con el inquilino de la USM
+   entraría cualquiera con correo de la universidad, estudiantes incluidos.
+
+La lista de editores es `EDITORES` y **falla cerrada**: sin lista, no entra nadie.
+
+#### b) GitHub — para quien administra el repositorio
+
+Se conserva la ruta nativa `/_studio` con OAuth de GitHub. Útil para el
+mantenedor. Ojo con la diferencia de comportamiento entre las dos:
+
+```js
+// GitHub (nativo)  — falla ABIERTO
+if (moderators.length > 0 && !moderators.includes(email)) → 403
+
+// Microsoft (propio) — falla CERRADO
+if (!editores.includes(correo)) → 403
+```
+
+Si `STUDIO_GITHUB_MODERATORS` se deja vacía, **cualquier cuenta de GitHub entra**.
+Compara contra el correo **primario** de GitHub.
+
+#### Variables
 
 Viven **fuera del repositorio**, en `C:\dimec\studio.env.ps1`, que carga
 `iniciar-dimec.ps1` antes de arrancar el servidor:
 
 | Variable | Para qué |
 |---|---|
-| `STUDIO_GITHUB_CLIENT_ID` | OAuth App de GitHub |
-| `STUDIO_GITHUB_CLIENT_SECRET` | OAuth App de GitHub |
-| `STUDIO_GITHUB_MODERATORS` | Correos autorizados, separados por comas |
+| `STUDIO_GITHUB_TOKEN` | Token con el que se publican **todos** los cambios |
+| `MS_TENANT_ID` / `MS_CLIENT_ID` / `MS_CLIENT_SECRET` | Registro de aplicación en Entra ID |
+| `EDITORES` | Correos `usm.cl` autorizados, separados por comas |
+| `STUDIO_GITHUB_CLIENT_ID` / `..._SECRET` | OAuth App de GitHub (puerta del mantenedor) |
+| `STUDIO_GITHUB_MODERATORS` | Correos autorizados por la puerta de GitHub |
 
-**`STUDIO_GITHUB_MODERATORS` es la única barrera de acceso.** El módulo solo
-aplica el filtro si la variable tiene contenido: si se deja vacía, cualquier
-persona con cuenta de GitHub puede autenticarse en el panel de un sitio público.
-Compara contra el correo **primario** de GitHub, no contra los secundarios.
-
-La OAuth App usa como callback:
+Direcciones de redirección que hay que declarar:
 
 ```
-https://dimec.pollomongoliano.cc/__nuxt_studio/auth/github
+Entra ID:  https://dimec.pollomongoliano.cc/api/entrar/microsoft
+GitHub:    https://dimec.pollomongoliano.cc/__nuxt_studio/auth/github
 ```
+
+**La autoría en git se pierde con la puerta de Microsoft**: todos los commits
+llevan la firma del dueño del `STUDIO_GITHUB_TOKEN`, no de quien editó.
 
 ### 4.5. Permisos por usuario (pendiente)
 
 Está previsto dar acceso a profesores para editar **solo su propia ficha**, y a
 otras personas para editar las páginas generales.
 
-El módulo trae autenticación (GitHub, GitLab, Google, SSO) pero **la lista blanca
-es plana**: no distingue quién puede tocar qué. No hay permisos por carpeta de
-fábrica.
+Hoy la lista `EDITORES` es **plana**: quien está en ella puede editarlo todo,
+incluidas las fichas de los demás.
 
-Lo que ya está preparado para ello: cada persona es **un fichero independiente**
-en `content/personas/`. Esa es la pieza que hace viable el permiso por persona —
-si todas vivieran en un único YAML no habría forma de separar el acceso. Para
-implementarlo habrá que añadir una capa propia sobre la sesión de Studio que
-compare el usuario autenticado con el fichero que intenta guardar.
+Dos cosas ya están preparadas para cuando se implemente:
+
+1. **Cada persona es un fichero independiente** en `content/personas/`. Es la
+   pieza que hace viable el permiso por persona; si todas vivieran en un único
+   YAML no habría forma de separar el acceso.
+2. **Todas las escrituras pasan por un único token del servidor**, no por
+   credenciales de cada usuario. Eso permite interceptar el guardado y comparar
+   el correo de la sesión con el fichero que se intenta tocar — algo imposible
+   cuando cada quien empujaba con su propio token de GitHub.
+
+El punto donde engancharlo es `setStudioUserSession`, en
+`server/api/entrar/microsoft.get.ts`: ahí se decide qué se guarda en la sesión.
 
 ---
 
@@ -265,13 +332,33 @@ volver al build anterior.
 | `DIMEC web` | Al iniciar Windows | Arranca el servidor Node |
 | `DIMEC autodespliegue` | Cada 2 minutos | Vigila GitHub y redespliega |
 
-Ambas corren como `SYSTEM`. Eso obliga a dos cosas que no son obvias:
+Ambas corren como `SYSTEM`. Eso obliga a tres cosas que no son obvias:
 
 - `git config --system safe.directory C:/dimec/src`, o git rechaza operar sobre un
   repositorio cuyo propietario es otro usuario.
 - `bun` se instala con winget dentro del perfil de `hp` y solo entra en el PATH de
   ese usuario, así que `desplegar.ps1` lo **resuelve por ruta absoluta**. Si se
   reinstala bun en otro sitio, hay que actualizar esa lista de rutas.
+- **La salida de bun va siempre a fichero, nunca a la tubería del proceso padre.**
+  Esto no es cosmético: sin redirigir, nadie consume esa tubería, el búfer del
+  sistema se llena y el proceso queda bloqueado escribiendo, con 0 % de CPU,
+  indefinidamente. Ocurrió dos veces (25 y 6 minutos sin avanzar) antes de
+  identificarlo. Ejecutado a mano no pasa, porque la consola vacía la salida.
+
+Por eso hay **límites de tiempo en dos capas**: 10 minutos para las dependencias
+y 20 para compilar dentro de `desplegar.ps1`, y 30 para el despliegue completo
+dentro de `vigilar-repo.ps1`. Al vencerse se mata el árbol de procesos con
+`taskkill /T` y se anota el fallo. Sin el límite exterior, un bloqueo dejaría la
+tarea «en ejecución» para siempre y, con `MultipleInstances=IgnoreNew`, todos los
+disparos siguientes se descartarían en silencio: el autodespliegue moriría sin
+que nadie se enterara.
+
+Dos trampas de PowerShell 5.1 que costaron un rato y conviene no reintroducir:
+
+- `Start-Process -PassThru` **no rellena `ExitCode`** salvo que se acceda antes a
+  `$p.Handle`. Sin eso, un comando correcto se da por fallido.
+- `$proceso.Kill($true)` para matar el árbol de procesos **no existe** en esta
+  versión: es de .NET moderno. Hay que usar `taskkill /T /F`.
 
 Registro del autodespliegue: `C:\dimec\autodespliegue.log`. Solo escribe cuando
 ocurre algo; el silencio significa que no había nada nuevo.
@@ -327,7 +414,7 @@ comprueba que el commit llegó a `origin/main`. Si hay un fallo anotado, ahí es
 el motivo. Para forzar: ejecuta `desplegar.ps1` a mano.
 
 **Una persona no aparece en `/personas`**
-Revisa que tenga `title` (el único campo sin valor por defecto) y que su
+Revisa que tenga `nombre` (el único campo sin valor por defecto) y que su
 `categoria`, si está puesta, sea uno de los cuatro valores válidos. Un fichero que
 no cumple el esquema se descarta sin avisar. Para ver qué ingirió realmente el
 sitio, consulta `.output\server\contents.sqlite`:

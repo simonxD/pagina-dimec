@@ -1,8 +1,7 @@
----
-title: 'Nombre Apellido'
-cargo: 'Auxiliar de laboratorio'
-categoria: apoyo
-orden: 2
+nombre: 'Nombre Apellido'
+cargo: 'Profesor de jornada parcial'
+categoria: parttime
+orden: 1
 email: 'correo@ejemplo.cl'
 foto: ''
 areas: []
@@ -11,6 +10,4 @@ investigaciones: []
 publicaciones: []
 docencia: []
 enlaces: []
----
-
-
+resena: ''

@@ -1,7 +1,6 @@
----
-title: 'Nombre Apellido'
-cargo: 'Encargado de gestión'
-categoria: administrativos
+nombre: 'Nombre Apellido'
+cargo: 'Profesora de jornada parcial'
+categoria: parttime
 orden: 2
 email: 'correo@ejemplo.cl'
 foto: ''
@@ -11,6 +10,4 @@ investigaciones: []
 publicaciones: []
 docencia: []
 enlaces: []
----
-
-
+resena: ''

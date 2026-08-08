@@ -115,7 +115,7 @@ function elegir(id: string) {
         >
           <ProfesorTarjeta
             v-for="p in visibles"
-            :key="p.path"
+            :key="p.stem"
             :persona="p"
           />
         </div>

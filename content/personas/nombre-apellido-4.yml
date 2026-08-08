@@ -1,5 +1,4 @@
----
-title: 'Nombre Apellido'
+nombre: 'Nombre Apellido'
 cargo: 'Profesor asistente'
 categoria: jornada
 orden: 4
@@ -12,6 +11,5 @@ investigaciones: []
 publicaciones: []
 docencia: []
 enlaces: []
----
-
-Reemplaza este párrafo por la reseña real.
+resena: |
+  Reemplaza este párrafo por la reseña real.
