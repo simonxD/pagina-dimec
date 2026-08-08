@@ -41,5 +41,8 @@
    Se baja a slate-600, que sube el contraste por encima de 6:1 sin cambiar el
    tono. Es un oscurecimiento leve, no un color distinto. */
 :root {
-  --ui-text-muted: var(--color-slate-600);
+  /* Valor literal y no var(--color-slate-600): Tailwind solo emite las
+     variables de su paleta que algun utilitario menciona, y aqui no la
+     menciona ninguno. Referenciarla dejaba el color invalido. */
+  --ui-text-muted: #45556c;
 }
