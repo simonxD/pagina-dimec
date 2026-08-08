@@ -5,32 +5,12 @@ useSeoMeta({
     'Campo ocupacional y salidas profesionales de la Ingeniería Civil Mecánica USM.'
 })
 
-const sectores = [
-  {
-    titulo: 'Energía',
-    descripcion: 'Generación, transmisión y eficiencia energética, con presencia creciente en renovables y almacenamiento.'
-  },
-  {
-    titulo: 'Minería',
-    descripcion: 'Diseño y operación de plantas, mantenimiento de equipos móviles y sistemas de transporte de mineral.'
-  },
-  {
-    titulo: 'Manufactura',
-    descripcion: 'Procesos de fabricación, automatización de líneas productivas y control de calidad.'
-  },
-  {
-    titulo: 'Consultoría e ingeniería de proyectos',
-    descripcion: 'Estudios de factibilidad, diseño de detalle e inspección técnica de obras.'
-  },
-  {
-    titulo: 'Investigación y desarrollo',
-    descripcion: 'Centros de investigación, universidades y áreas de innovación de la industria.'
-  },
-  {
-    titulo: 'Emprendimiento',
-    descripcion: 'Creación de empresas de base tecnológica a partir de desarrollos propios.'
-  }
-]
+// El contenido vive en content/paginas/oportunidades.yml y se edita desde /_studio.
+const { data: pagina } = await useAsyncData('pagina-oportunidades', () =>
+  queryCollection('oportunidades').first()
+)
+
+const sectores = computed(() => pagina.value?.sectores ?? [])
 </script>
 
 <template>
@@ -40,8 +20,7 @@ const sectores = [
 
     <div class="mx-auto w-full max-w-[1200px] px-5 py-10 lg:px-2.5">
       <p class="text-lg text-muted mb-10">
-        La formación en ingeniería mecánica abre puertas en sectores muy distintos entre sí.
-        Estas son las salidas más frecuentes de nuestros egresados y egresadas.
+        {{ pagina?.intro }}
       </p>
 
       <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

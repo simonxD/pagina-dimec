@@ -1,0 +1,16 @@
+intro: >-
+  El Departamento cubre el ciclo formativo completo, desde la carrera de pregrado
+  hasta los programas de postgrado y la especialización de profesionales.
+
+programas:
+  - titulo: Pregrado
+    descripcion: >-
+      Ingeniería Civil Mecánica, dictada en el Campus Casa Central Valparaíso y en
+      el Campus San Joaquín.
+    to: /pregrado
+  - titulo: Postgrado
+    descripcion: Dos magísteres y un doctorado, entre formación científica y profesional.
+    to: /postgrado
+  - titulo: Educación continua
+    descripcion: Diplomados y cursos de especialización para profesionales en ejercicio.
+    to: /educacion-continua

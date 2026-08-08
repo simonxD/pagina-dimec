@@ -5,14 +5,12 @@ useSeoMeta({
     'Asignaturas impartidas por el Departamento de Ingeniería Mecánica USM.'
 })
 
-// Datos de ejemplo: reemplazar por el catálogo real de asignaturas.
-const asignaturas = [
-  { codigo: 'IWM000', nombre: 'Nombre de la asignatura', nivel: 'Pregrado', creditos: 3 },
-  { codigo: 'IWM001', nombre: 'Nombre de la asignatura', nivel: 'Pregrado', creditos: 3 },
-  { codigo: 'IWM002', nombre: 'Nombre de la asignatura', nivel: 'Pregrado', creditos: 4 },
-  { codigo: 'IWM100', nombre: 'Nombre de la asignatura', nivel: 'Postgrado', creditos: 5 },
-  { codigo: 'IWM101', nombre: 'Nombre de la asignatura', nivel: 'Postgrado', creditos: 5 }
-]
+// El contenido vive en content/paginas/asignaturas.yml y se edita desde /_studio.
+const { data: pagina } = await useAsyncData('pagina-asignaturas', () =>
+  queryCollection('asignaturas').first()
+)
+
+const asignaturas = computed(() => pagina.value?.asignaturas ?? [])
 </script>
 
 <template>
@@ -22,7 +20,7 @@ const asignaturas = [
 
     <div class="mx-auto w-full max-w-[1200px] px-5 py-10 lg:px-2.5">
       <p class="text-lg text-muted mb-10">
-        Asignaturas impartidas por el Departamento, en pregrado y postgrado.
+        {{ pagina?.intro }}
       </p>
 
       <ul class="border-t border-default">

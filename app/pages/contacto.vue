@@ -43,12 +43,13 @@ async function onSubmit(_event: FormSubmitEvent<typeof state>) {
   })
 }
 
-const datos = [
-  { icon: 'i-lucide-map-pin', label: 'Dirección', valor: 'Completar dirección del departamento' },
-  { icon: 'i-lucide-phone', label: 'Teléfono', valor: 'Completar teléfono' },
-  { icon: 'i-lucide-mail', label: 'Correo', valor: 'Completar correo de contacto' },
-  { icon: 'i-lucide-clock', label: 'Horario', valor: 'Completar horario de atención' }
-]
+// El contenido vive en content/paginas/contacto.yml y se edita desde /_studio.
+// El formulario de envío no es contenido: su lógica se queda en el código.
+const { data: pagina } = await useAsyncData('pagina-contacto', () =>
+  queryCollection('contacto').first()
+)
+
+const datos = computed(() => pagina.value?.datos ?? [])
 </script>
 
 <template>
@@ -58,7 +59,7 @@ const datos = [
 
     <div class="mx-auto w-full max-w-[1200px] px-5 py-10 lg:px-2.5">
       <p class="text-lg text-muted mb-10">
-        Para consultas sobre admisión, docencia, investigación o colaboración con la industria.
+        {{ pagina?.intro }}
       </p>
 
       <div class="grid gap-10 lg:grid-cols-[1fr_20rem]">

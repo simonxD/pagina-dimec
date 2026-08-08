@@ -1,0 +1,15 @@
+intro: >-
+  El Departamento ofrece formación para profesionales que buscan actualizarse o
+  especializarse sin dejar el ejercicio de su carrera.
+
+modalidades:
+  - titulo: Diplomados
+    descripcion: >-
+      Programas de varios meses orientados a la especialización técnica de
+      profesionales en ejercicio.
+  - titulo: Cursos de especialización
+    descripcion: >-
+      Formación breve sobre herramientas y normativas concretas del ejercicio
+      profesional.
+  - titulo: Capacitación a empresas
+    descripcion: Programas diseñados a medida para equipos técnicos de una organización.

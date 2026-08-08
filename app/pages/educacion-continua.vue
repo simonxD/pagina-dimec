@@ -5,20 +5,12 @@ useSeoMeta({
     'Diplomados y cursos de especialización del Departamento de Ingeniería Mecánica USM.'
 })
 
-const modalidades = [
-  {
-    titulo: 'Diplomados',
-    descripcion: 'Programas de varios meses orientados a la especialización técnica de profesionales en ejercicio.'
-  },
-  {
-    titulo: 'Cursos de especialización',
-    descripcion: 'Formación breve sobre herramientas y normativas concretas del ejercicio profesional.'
-  },
-  {
-    titulo: 'Capacitación a empresas',
-    descripcion: 'Programas diseñados a medida para equipos técnicos de una organización.'
-  }
-]
+// El contenido vive en content/paginas/educacion-continua.yml y se edita desde /_studio.
+const { data: pagina } = await useAsyncData('pagina-educacion-continua', () =>
+  queryCollection('educacionContinua').first()
+)
+
+const modalidades = computed(() => pagina.value?.modalidades ?? [])
 </script>
 
 <template>
@@ -28,8 +20,7 @@ const modalidades = [
 
     <div class="mx-auto w-full max-w-[1200px] px-5 py-10 lg:px-2.5">
       <p class="text-lg text-muted mb-10">
-        El Departamento ofrece formación para profesionales que buscan actualizarse o
-        especializarse sin dejar el ejercicio de su carrera.
+        {{ pagina?.intro }}
       </p>
 
       <div class="grid gap-5 md:grid-cols-3">

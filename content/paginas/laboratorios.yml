@@ -1,0 +1,17 @@
+intro: >-
+  El Departamento cuenta con laboratorios de docencia e investigación en ambos
+  campus, disponibles para trabajos de título, tesis y proyectos con la industria.
+
+laboratorios:
+  - nombre: Laboratorio de ensayo de materiales
+    detalle: Campus Casa Central Valparaíso
+  - nombre: Laboratorio de termofluidos
+    detalle: Campus Casa Central Valparaíso
+  - nombre: Laboratorio de vibraciones y acústica
+    detalle: Campus Casa Central Valparaíso
+  - nombre: Laboratorio de manufactura
+    detalle: Campus Casa Central Valparaíso
+  - nombre: Laboratorio de automatización
+    detalle: Campus San Joaquín
+  - nombre: Sala de simulación computacional
+    detalle: Campus San Joaquín

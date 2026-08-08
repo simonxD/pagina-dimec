@@ -1,0 +1,19 @@
+intro: >-
+  Para consultas sobre admisión, docencia, investigación o colaboración con la
+  industria.
+
+tituloDatos: Datos de contacto
+
+datos:
+  - label: Dirección
+    valor: Completar dirección del departamento
+    icon: i-lucide-map-pin
+  - label: Teléfono
+    valor: Completar teléfono
+    icon: i-lucide-phone
+  - label: Correo
+    valor: Completar correo de contacto
+    icon: i-lucide-mail
+  - label: Horario
+    valor: Completar horario de atención
+    icon: i-lucide-clock

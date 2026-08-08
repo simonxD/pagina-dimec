@@ -1,0 +1,33 @@
+intro: >-
+  La investigación del Departamento se organiza en siete áreas, que combinan
+  desarrollo teórico, simulación y trabajo experimental en laboratorio.
+
+# El nombre y el icono de cada área están en app/utils/areas.ts, porque las fichas
+# de personas apuntan a estos identificadores. Aquí solo se edita la descripción.
+descripciones:
+  - area: termicos
+    texto: >-
+      Combustión, transferencia de calor, sistemas de generación y eficiencia
+      energética en procesos industriales.
+  - area: fluidos
+    texto: >-
+      Mecánica de fluidos experimental y computacional, turbomáquinas y flujos
+      multifásicos.
+  - area: renovables
+    texto: >-
+      Solar, eólica, geotermia, almacenamiento e integración de fuentes renovables
+      al sistema energético.
+  - area: produccion
+    texto: >-
+      Diseño y optimización de sistemas productivos, logística, calidad y gestión
+      de operaciones.
+  - area: mantenimiento
+    texto: >-
+      Confiabilidad, mantenimiento predictivo, gestión de activos y análisis de
+      fallas.
+  - area: mecatronica
+    texto: Robótica, control automático, instrumentación y automatización de procesos.
+  - area: solidos
+    texto: >-
+      Diseño de máquinas, mecánica de sólidos, fatiga, elementos finitos y análisis
+      estructural.

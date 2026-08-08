@@ -5,20 +5,12 @@ useSeoMeta({
     'Campus donde el Departamento de Ingeniería Mecánica USM imparte sus programas.'
 })
 
-const campus = [
-  {
-    nombre: 'Campus Casa Central Valparaíso',
-    direccion: 'Avda. España 1680, Valparaíso',
-    telefono: '+56 32 2654 162',
-    detalle: 'Sede histórica del Departamento. Concentra los laboratorios de ensayo de materiales, termofluidos, vibraciones y manufactura.'
-  },
-  {
-    nombre: 'Campus San Joaquín',
-    direccion: 'Av. Vicuña Mackenna 3939, San Joaquín, Santiago',
-    telefono: '+56 2 2303 72 50',
-    detalle: 'Imparte Ingeniería Civil Mecánica desde 2009. Cuenta con laboratorio de automatización y sala de simulación computacional.'
-  }
-]
+// El contenido vive en content/paginas/campus.yml y se edita desde /_studio.
+const { data: pagina } = await useAsyncData('pagina-campus', () =>
+  queryCollection('campus').first()
+)
+
+const campus = computed(() => pagina.value?.campus ?? [])
 </script>
 
 <template>
@@ -28,7 +20,7 @@ const campus = [
 
     <div class="mx-auto w-full max-w-[1200px] px-5 py-10 lg:px-2.5">
       <p class="text-lg text-muted mb-10">
-        La carrera se dicta en dos campus, con laboratorios y equipos propios en cada uno.
+        {{ pagina?.intro }}
       </p>
 
       <div class="grid gap-5 md:grid-cols-2">

@@ -1,0 +1,24 @@
+intro: >-
+  La formación en ingeniería mecánica abre puertas en sectores muy distintos entre
+  sí. Estas son las salidas más frecuentes de nuestros egresados y egresadas.
+
+sectores:
+  - titulo: Energía
+    descripcion: >-
+      Generación, transmisión y eficiencia energética, con presencia creciente en
+      renovables y almacenamiento.
+  - titulo: Minería
+    descripcion: >-
+      Diseño y operación de plantas, mantenimiento de equipos móviles y sistemas de
+      transporte de mineral.
+  - titulo: Manufactura
+    descripcion: >-
+      Procesos de fabricación, automatización de líneas productivas y control de
+      calidad.
+  - titulo: Consultoría e ingeniería de proyectos
+    descripcion: Estudios de factibilidad, diseño de detalle e inspección técnica de obras.
+  - titulo: Investigación y desarrollo
+    descripcion: >-
+      Centros de investigación, universidades y áreas de innovación de la industria.
+  - titulo: Emprendimiento
+    descripcion: Creación de empresas de base tecnológica a partir de desarrollos propios.

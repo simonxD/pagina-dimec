@@ -1,0 +1,22 @@
+intro: Plataformas que vas a usar durante la carrera, reunidas en un solo lugar.
+
+# Pendiente: confirmar las URL internas del Departamento antes de publicar.
+sitios:
+  - nombre: Aula USM
+    descripcion: Plataforma de cursos, material y entregas de las asignaturas.
+    url: https://aula.usm.cl/
+  - nombre: Sistema de Información de Gestión Académica
+    descripcion: Inscripción de asignaturas, avance curricular y certificados.
+    url: https://siga.usm.cl/pag/
+  - nombre: Portal de Autoservicio Institucional
+    descripcion: Trámites administrativos y datos personales.
+    url: https://ssb.usm.cl
+  - nombre: Biblioteca
+    descripcion: Catálogo, préstamos y acceso a bases de datos científicas.
+    url: https://biblioteca.usm.cl/
+  - nombre: Directorio USM
+    descripcion: Contactos de unidades académicas y administrativas.
+    url: https://directorio.usm.cl/
+  - nombre: Dirección de Tecnologías de la Información
+    descripcion: Correo institucional, redes y soporte técnico.
+    url: https://dti.usm.cl/

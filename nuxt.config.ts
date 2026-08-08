@@ -25,6 +25,22 @@ export default defineNuxtConfig({
       // respondera 404 al buscar la rama: un token sin permiso no distingue
       // entre "no existe" y "no puedes verlo".
       private: false
+    },
+    // El editor lo va a usar gente del Departamento, no desarrolladores. Se
+    // recortan las herramientas que solo tienen sentido escribiendo codigo o
+    // maquetando: bloques de codigo, lineas horizontales, video incrustado e
+    // insercion de componentes Vue. Dejarlas visibles invita a romper el
+    // formato del sitio sin darse cuenta.
+    editor: {
+      commands: {
+        exclude: ['codeBlock', 'code', 'horizontalRule', 'video', 'style', 'insert']
+      },
+      components: {
+        exclude: ['*']
+      },
+      // El sitio usa iconos de lucide. Limitar el selector evita elegir uno de
+      // otra familia que luego no se muestre.
+      iconLibraries: ['lucide']
     }
   },
   // El sitio institucional no tiene modo oscuro. Desactivarlo por completo evita

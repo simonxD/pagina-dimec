@@ -1,0 +1,15 @@
+intro: La carrera se dicta en dos campus, con laboratorios y equipos propios en cada uno.
+
+campus:
+  - nombre: Campus Casa Central Valparaíso
+    direccion: Avda. España 1680, Valparaíso
+    telefono: +56 32 2654 162
+    detalle: >-
+      Sede histórica del Departamento. Concentra los laboratorios de ensayo de
+      materiales, termofluidos, vibraciones y manufactura.
+  - nombre: Campus San Joaquín
+    direccion: Av. Vicuña Mackenna 3939, San Joaquín, Santiago
+    telefono: +56 2 2303 72 50
+    detalle: >-
+      Imparte Ingeniería Civil Mecánica desde 2009. Cuenta con laboratorio de
+      automatización y sala de simulación computacional.

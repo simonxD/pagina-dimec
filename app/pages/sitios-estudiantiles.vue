@@ -5,39 +5,12 @@ useSeoMeta({
     'Plataformas y servicios en línea para estudiantes del Departamento de Ingeniería Mecánica USM.'
 })
 
-// TODO: confirmar las URL internas del Departamento antes de publicar.
-const sitios = [
-  {
-    nombre: 'Aula USM',
-    descripcion: 'Plataforma de cursos, material y entregas de las asignaturas.',
-    url: 'https://aula.usm.cl/'
-  },
-  {
-    nombre: 'Sistema de Información de Gestión Académica',
-    descripcion: 'Inscripción de asignaturas, avance curricular y certificados.',
-    url: 'https://siga.usm.cl/pag/'
-  },
-  {
-    nombre: 'Portal de Autoservicio Institucional',
-    descripcion: 'Trámites administrativos y datos personales.',
-    url: 'https://ssb.usm.cl'
-  },
-  {
-    nombre: 'Biblioteca',
-    descripcion: 'Catálogo, préstamos y acceso a bases de datos científicas.',
-    url: 'https://biblioteca.usm.cl/'
-  },
-  {
-    nombre: 'Directorio USM',
-    descripcion: 'Contactos de unidades académicas y administrativas.',
-    url: 'https://directorio.usm.cl/'
-  },
-  {
-    nombre: 'Dirección de Tecnologías de la Información',
-    descripcion: 'Correo institucional, redes y soporte técnico.',
-    url: 'https://dti.usm.cl/'
-  }
-]
+// El contenido vive en content/paginas/sitios-estudiantiles.yml y se edita desde /_studio.
+const { data: pagina } = await useAsyncData('pagina-sitios-estudiantiles', () =>
+  queryCollection('sitiosEstudiantiles').first()
+)
+
+const sitios = computed(() => pagina.value?.sitios ?? [])
 </script>
 
 <template>
@@ -47,7 +20,7 @@ const sitios = [
 
     <div class="mx-auto w-full max-w-[1200px] px-5 py-10 lg:px-2.5">
       <p class="text-lg text-muted mb-10">
-        Plataformas que vas a usar durante la carrera, reunidas en un solo lugar.
+        {{ pagina?.intro }}
       </p>
 
       <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

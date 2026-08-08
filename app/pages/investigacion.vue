@@ -5,17 +5,19 @@ useSeoMeta({
     'Áreas de investigación del Departamento de Ingeniería Mecánica USM.'
 })
 
-// Descripción de cada una de las siete áreas. Los identificadores y los
-// nombres vienen de app/utils/areas.ts, que también alimenta el menú.
-const descripciones: Record<string, string> = {
-  termicos: 'Combustión, transferencia de calor, sistemas de generación y eficiencia energética en procesos industriales.',
-  fluidos: 'Mecánica de fluidos experimental y computacional, turbomáquinas y flujos multifásicos.',
-  renovables: 'Solar, eólica, geotermia, almacenamiento e integración de fuentes renovables al sistema energético.',
-  produccion: 'Diseño y optimización de sistemas productivos, logística, calidad y gestión de operaciones.',
-  mantenimiento: 'Confiabilidad, mantenimiento predictivo, gestión de activos y análisis de fallas.',
-  mecatronica: 'Robótica, control automático, instrumentación y automatización de procesos.',
-  solidos: 'Diseño de máquinas, mecánica de sólidos, fatiga, elementos finitos y análisis estructural.'
-}
+// El contenido vive en content/paginas/investigacion.yml y se edita desde /_studio.
+// Los identificadores y los nombres de las áreas siguen en app/utils/areas.ts,
+// que también alimenta el menú y las fichas de personas: aquí solo se edita el
+// texto descriptivo de cada una.
+const { data: pagina } = await useAsyncData('pagina-investigacion', () =>
+  queryCollection('investigacion').first()
+)
+
+// El YAML guarda una lista para que el formulario de Studio sea manejable; la
+// plantilla necesita un acceso por identificador de área.
+const descripciones = computed<Record<string, string>>(() =>
+  Object.fromEntries((pagina.value?.descripciones ?? []).map(d => [d.area, d.texto]))
+)
 </script>
 
 <template>
@@ -25,8 +27,7 @@ const descripciones: Record<string, string> = {
 
     <div class="mx-auto w-full max-w-[1200px] px-5 py-10 lg:px-2.5">
       <p class="text-lg text-muted mb-10">
-        La investigación del Departamento se organiza en siete áreas, que combinan
-        desarrollo teórico, simulación y trabajo experimental en laboratorio.
+        {{ pagina?.intro }}
       </p>
 
       <div class="space-y-10">

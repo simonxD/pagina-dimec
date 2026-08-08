@@ -5,23 +5,12 @@ useSeoMeta({
     'Programas de pregrado, postgrado y educación continua del Departamento de Ingeniería Mecánica USM.'
 })
 
-const programas = [
-  {
-    titulo: 'Pregrado',
-    descripcion: 'Ingeniería Civil Mecánica, dictada en el Campus Casa Central Valparaíso y en el Campus San Joaquín.',
-    to: '/pregrado'
-  },
-  {
-    titulo: 'Postgrado',
-    descripcion: 'Dos magísteres y un doctorado, entre formación científica y profesional.',
-    to: '/postgrado'
-  },
-  {
-    titulo: 'Educación continua',
-    descripcion: 'Diplomados y cursos de especialización para profesionales en ejercicio.',
-    to: '/educacion-continua'
-  }
-]
+// El contenido vive en content/paginas/estudios.yml y se edita desde /_studio.
+const { data: pagina } = await useAsyncData('pagina-estudios', () =>
+  queryCollection('estudios').first()
+)
+
+const programas = computed(() => pagina.value?.programas ?? [])
 </script>
 
 <template>
@@ -31,8 +20,7 @@ const programas = [
 
     <div class="mx-auto w-full max-w-[1200px] px-5 py-10 lg:px-2.5">
       <p class="text-lg text-muted mb-10">
-        El Departamento cubre el ciclo formativo completo, desde la carrera de pregrado
-        hasta los programas de postgrado y la especialización de profesionales.
+        {{ pagina?.intro }}
       </p>
 
       <div class="grid gap-5 md:grid-cols-3">

@@ -1,0 +1,22 @@
+intro: >-
+  El Departamento imparte tres programas de continuidad de estudios, entre
+  formación científica y profesional.
+
+# El campo `id` es el ancla del enlace del menú principal: /postgrado#doctorado.
+# Si se cambia aquí, hay que cambiarlo también en app/utils/navigation.ts.
+programas:
+  - id: magister-ciencias
+    titulo: Magíster en Ciencias de Ingeniería Mecánica
+    descripcion: >-
+      Programa de carácter científico orientado a la investigación, complementario
+      al Doctorado en Ingeniería Mecánica.
+  - id: magister-energia
+    titulo: Magíster en Economía Energética
+    descripcion: >-
+      Primer programa de postgrado profesional del área energética del país, en
+      funcionamiento desde 2005.
+  - id: doctorado
+    titulo: Doctorado en Ingeniería Mecánica
+    descripcion: >-
+      En funcionamiento desde 1964. La USM fue la primera universidad de América
+      Latina en ofrecer programas de doctorado en ingeniería.

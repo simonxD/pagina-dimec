@@ -1,0 +1,19 @@
+intro: >-
+  El Departamento imparte la carrera de Ingeniería Civil Mecánica, con un plan de
+  estudios con enfoque en competencias que se dicta en ambos campus.
+
+areasFormacion:
+  - titulo: Diseño y mecánica de sólidos
+    descripcion: Diseño de máquinas, resistencia de materiales, elementos finitos y vibraciones.
+  - titulo: Energía y termofluidos
+    descripcion: Termodinámica, transferencia de calor, mecánica de fluidos y sistemas energéticos.
+  - titulo: Manufactura y materiales
+    descripcion: Procesos de fabricación, metalurgia, tratamientos térmicos y control de calidad.
+  - titulo: Automatización y control
+    descripcion: Mecatrónica, instrumentación, control automático y robótica industrial.
+
+campus:
+  - nombre: Campus Casa Central Valparaíso
+    detalle: Avda. España 1680, Valparaíso
+  - nombre: Campus San Joaquín
+    detalle: Av. Vicuña Mackenna 3939, San Joaquín, Santiago

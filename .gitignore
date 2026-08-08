@@ -23,9 +23,11 @@ logs
 .env.*
 !.env.example
 
-# El gestor de paquetes del proyecto es npm: es con el que se compila el sitio
-# que esta en produccion, asi que package-lock.json si va versionado.
+# El gestor de paquetes del proyecto es bun, y bun.lock va versionado.
 #
-# Antes habia un bun.lock. Se elimino porque quedo desincronizado al anadir
-# nuxt-studio y un lockfile obsoleto rompe instalaciones en silencio: describe
-# un arbol de dependencias que ya no es el que construye el sitio.
+# No mezclar con npm: @nuxt/content declara better-sqlite3 ^12.5.0 como peer
+# opcional mientras el proyecto usa ^13.0.3, y npm aborta ante ese conflicto
+# salvo que se le pase --legacy-peer-deps. bun lo resuelve sin ayuda. Si algun
+# npm install deja un package-lock.json suelto, se ignora aqui para que no
+# convivan dos lockfiles describiendo arboles distintos.
+package-lock.json
