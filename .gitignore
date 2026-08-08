@@ -23,5 +23,9 @@ logs
 .env.*
 !.env.example
 
-# npm solo se usó para el binario precompilado de better-sqlite3; el lockfile es bun.lock
-package-lock.json
+# El gestor de paquetes del proyecto es npm: es con el que se compila el sitio
+# que esta en produccion, asi que package-lock.json si va versionado.
+#
+# Antes habia un bun.lock. Se elimino porque quedo desincronizado al anadir
+# nuxt-studio y un lockfile obsoleto rompe instalaciones en silencio: describe
+# un arbol de dependencias que ya no es el que construye el sitio.

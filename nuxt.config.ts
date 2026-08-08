@@ -2,13 +2,29 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/ui', '@nuxt/content'],
+  modules: ['@nuxt/ui', '@nuxt/content', 'nuxt-studio'],
   css: ['~/assets/css/main.css'],
-  // Habilita la edición desde nuxt.studio. Studio se conecta al repositorio de
-  // GitHub del proyecto y escribe sobre los archivos de content/.
-  content: {
-    preview: {
-      api: 'https://api.nuxt.studio'
+  // Edición desde el propio sitio, en /_studio. Studio dejó de ser la plataforma
+  // alojada en nuxt.studio y pasó a ser un módulo autoalojado: el editor se sirve
+  // desde este servidor y publica haciendo commit al repositorio.
+  //
+  // Sustituye a la configuración anterior (content.preview.api), que apuntaba a
+  // la API de la plataforma antigua y ya no interviene.
+  studio: {
+    route: '/_studio',
+    repository: {
+      provider: 'github',
+      owner: 'simonxD',
+      repo: 'pagina-dimec',
+      branch: 'main',
+      // El repositorio es publico, asi que basta el scope 'public_repo' y el
+      // token que emite GitHub no alcanza ningun repositorio privado de la
+      // cuenta. Con private: true pediria 'repo', que da acceso a todos.
+      //
+      // Si algun dia se vuelve privado hay que poner private: true, o la API
+      // respondera 404 al buscar la rama: un token sin permiso no distingue
+      // entre "no existe" y "no puedes verlo".
+      private: false
     }
   },
   // El sitio institucional no tiene modo oscuro. Desactivarlo por completo evita

@@ -1,2 +1,9 @@
+# El sitio esta publicado pero su contenido todavia es de plantilla: las fichas
+# de personas dicen "nombre-apellido-1" y las noticias "Titulo de la publicacion".
+# Hasta que haya contenido real conviene no aparecer en buscadores, sobre todo
+# porque el sitio lleva la identidad visual de la USM y podria confundirse con
+# el oficial.
+#
+# Para abrirlo a los buscadores, deja "Disallow:" vacio como estaba antes.
 User-Agent: *
-Disallow:
+Disallow: /
