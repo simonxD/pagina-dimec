@@ -355,7 +355,63 @@ del módulo. Por eso el token debe tener el alcance mínimo (`public_repo`, o
 *fine-grained* limitado a este repositorio) y por eso importa quién está en la
 lista de editores.
 
-### 4.6. Permisos por usuario (pendiente)
+### 4.6. Cuentas y permisos
+
+Las cuentas se gestionan desde **`/administrar`**, visible solo para quien tenga
+el rol `admin`. Sustituye al script `bun run editor`, que obligaba a entrar por
+consola a la máquina; el script sigue existiendo como salida de emergencia si
+alguna vez nadie puede entrar.
+
+Cada cuenta tiene:
+
+| Campo | Para qué |
+|---|---|
+| `rol` | `admin` gestiona cuentas; `editor` no |
+| `ficha` | Qué perfil de Personas le corresponde, p. ej. `jornada/nombre-apellido-1` |
+
+Dos salvaguardas impiden dejar el sistema sin quien lo gobierne: nadie puede
+quitarse a sí mismo el rol de administrador ni borrar su propia cuenta, y no se
+puede eliminar la última cuenta con permisos de administración. Sin ellas habría
+que reparar el JSON a mano en el servidor.
+
+#### Lo que el rol NO controla
+
+**El rol decide quién gestiona cuentas, no qué puede editar cada persona.**
+
+Nuxt Studio publica llamando a `https://api.github.com` **desde el navegador**,
+con el token en la sesión. Cualquiera que entre al editor puede leer ese token
+—está en `/__nuxt_studio/auth/session`— y escribir en cualquier fichero del
+repositorio. Un permiso por carpeta implementado en esta aplicación sería
+decorativo: se vería aplicado y se saltaría abriendo las herramientas del
+navegador.
+
+Para que fuese real habría que **interponer el servidor**: parchear Studio para
+que su URL base apunte a un endpoint propio en vez de a la API de GitHub, y que
+ese endpoint compruebe el usuario de la sesión contra el fichero que intenta
+escribir antes de reenviar la petición con el token, que dejaría de salir del
+servidor. Es un proyecto en sí mismo —hay que cubrir todas las llamadas que
+Studio hace: referencias, árboles, blobs, commits— y cualquiera que se escape
+rompe la publicación.
+
+Mientras tanto: la lista de cuentas es la barrera real. Quien está dentro puede
+tocarlo todo.
+
+### 4.7. Por qué no PocketBase ni Firebase
+
+Se evaluaron al plantear la gestión de usuarios y se descartaron:
+
+- **Firebase** exige crear el proyecto desde la consola de Google con una cuenta
+  propia. No se puede automatizar desde aquí.
+- **PocketBase** sí es instalable —un binario con SQLite y panel propio— pero
+  añade un servicio más corriendo en el mismo PC, otro puerto y otra cosa que
+  mantener viva, **y no resuelve el problema**: la limitación está en cómo
+  publica Studio, no en dónde se guardan los usuarios.
+
+Las cuentas viven en `C:dimeceditores.json`, fuera del repositorio, con las
+contraseñas hasheadas con scrypt. Para un puñado de editores es suficiente y no
+añade infraestructura.
+
+### 4.8. Permisos por fichero (pendiente)
 
 Está previsto dar acceso a profesores para editar **solo su propia ficha**, y a
 otras personas para editar las páginas generales.

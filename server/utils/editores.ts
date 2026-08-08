@@ -14,7 +14,7 @@
  *
  *   bun run editor
  */
-import { readFileSync } from 'node:fs'
+import { readFileSync, writeFileSync, renameSync } from 'node:fs'
 import { scryptSync, timingSafeEqual, randomBytes } from 'node:crypto'
 
 export interface Editor {
@@ -23,6 +23,28 @@ export interface Editor {
   correo: string
   /** Formato: scrypt$<sal en hex>$<hash en hex> */
   clave: string
+  /**
+   * `admin` puede gestionar cuentas; `editor` no.
+   *
+   * Ojo con lo que este rol NO hace: no limita que puede tocar cada quien
+   * dentro del editor. Studio publica llamando a la API de GitHub desde el
+   * navegador, con el token en la sesion, asi que cualquiera con acceso puede
+   * extraerlo y escribir en cualquier fichero. El rol gobierna esta aplicacion,
+   * no el contenido. Ver el README, seccion de permisos.
+   */
+  rol?: 'admin' | 'editor'
+  /**
+   * Ficha de Personas que le corresponde, si tiene.
+   *
+   * Ejemplo: `jornada/nombre-apellido-1`. Sirve para llevar la cuenta de quien
+   * mantiene que perfil y para los administradores sin ficha propia, que lo
+   * dejan vacio.
+   */
+  ficha?: string
+}
+
+export function esAdmin(editor: Editor | undefined): boolean {
+  return editor?.rol === 'admin'
 }
 
 const RUTA = process.env.EDITORES_FICHERO || 'C:\\dimec\\editores.json'
@@ -99,4 +121,17 @@ export function anotarFallo(usuario: string): void {
 
 export function limpiarFallos(usuario: string): void {
   intentos.delete(usuario)
+}
+
+/**
+ * Escribe el fichero de cuentas.
+ *
+ * Se escribe primero en un fichero temporal y luego se sustituye, para que una
+ * interrupción a media escritura no deje el JSON cortado: si eso pasara, nadie
+ * podría entrar y el fichero tendría que repararse a mano en el servidor.
+ */
+export function guardarEditores(editores: Editor[]): void {
+  const temporal = `${RUTA}.tmp`
+  writeFileSync(temporal, JSON.stringify(editores, null, 2) + '\n', 'utf8')
+  renameSync(temporal, RUTA)
 }
