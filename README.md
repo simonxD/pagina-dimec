@@ -170,14 +170,14 @@ publicar hace *commit* contra el repositorio de GitHub.
 ### 4.2. Entrar
 
 ```
-Editores:    https://dimec.pollomongoliano.cc/api/entrar/microsoft
+Editores:    https://dimec.pollomongoliano.cc/entrar
 Mantenedor:  https://dimec.pollomongoliano.cc/_studio
 ```
 
-La primera usa la cuenta institucional `usm.cl` y **no requiere cuenta de
-GitHub**. La segunda es OAuth de GitHub y existe para quien administra el
-repositorio. Ambas dejan la misma sesión y abren el mismo editor: tras entrar, la
-interfaz de Studio aparece sobre el propio sitio. Detalle en §4.4.
+La primera es usuario y contraseña, gestionadas desde la máquina, y **no requiere
+cuenta de GitHub**. La segunda es OAuth de GitHub y existe para quien administra
+el repositorio. Ambas dejan la misma sesión y abren el mismo editor: tras entrar,
+la interfaz de Studio aparece sobre el propio sitio. Detalle en §4.4.
 
 ### 4.3. Configuración
 
@@ -194,17 +194,57 @@ En `nuxt.config.ts`, bloque `studio`:
 
 ### 4.4. Quién entra, y cómo
 
-Hay **dos puertas**, y responden a necesidades distintas.
+Hay **tres puertas**. Todas terminan llamando a `setStudioUserSession`, que es
+quien adjunta el token de escritura del servidor: por eso **ningún editor
+necesita cuenta de GitHub**, entre por donde entre.
 
-#### a) Cuenta institucional Microsoft — para los editores
+#### a) Cuenta propia — la que está en uso hoy
+
+```
+https://dimec.pollomongoliano.cc/entrar
+```
+
+Usuario y contraseña, gestionados desde la máquina. Es un **puente**: existe
+porque registrar la aplicación en Entra ID requiere permisos de administrador del
+inquilino de la USM, que hay que pedir a la DTI.
+
+Las cuentas viven en `C:\dimec\editores.json`, fuera del repositorio, con la
+contraseña hasheada con **scrypt**. Se gestionan con:
+
+```bash
+cd C:\dimec\src
+bun run editor           # listar
+bun run editor agregar   # crear cuenta o cambiar contraseña
+bun run editor quitar    # eliminar
+```
+
+Tras cualquier cambio hay que reiniciar el sitio.
+
+Tres medidas que no son opcionales teniendo un formulario expuesto a internet, y
+que conviene no quitar:
+
+- **scrypt** en vez de un hash rápido: hace inviable probar contraseñas en masa
+  si el fichero se filtrara.
+- **Bloqueo de 15 minutos tras 5 fallos**, en memoria. Reiniciar el servidor
+  limpia los bloqueos.
+- **Comparación en tiempo constante**, y se calcula un hash señuelo aunque el
+  usuario no exista: si no, la diferencia de tiempo revelaría qué usuarios son
+  reales.
+
+**No hay recuperación de contraseña.** No hay correo de reseteo: si alguien la
+olvida, se le asigna una nueva con `bun run editor agregar`. Manejable para unos
+pocos editores; no lo sería para decenas.
+
+#### b) Cuenta institucional Microsoft — pendiente de la DTI
 
 ```
 https://dimec.pollomongoliano.cc/api/entrar/microsoft
 ```
 
-Es la puerta normal. El editor entra con su correo `usm.cl` y **no necesita
-cuenta de GitHub**: los cambios se publican con un token del servidor
-(`STUDIO_GITHUB_TOKEN`), que el módulo adjunta a la sesión.
+La ruta está escrita y probada, a la espera de que se pueda registrar la
+aplicación en Entra ID. Cuando exista, es rellenar `MS_TENANT_ID`,
+`MS_CLIENT_ID`, `MS_CLIENT_SECRET` y `EDITORES`, y se puede dejar de repartir
+cuentas propias.
 
 La ruta es propia (`server/api/entrar/microsoft.get.ts`) y no el proveedor SSO
 que trae nuxt-studio, por dos razones concretas:
@@ -217,7 +257,7 @@ que trae nuxt-studio, por dos razones concretas:
 
 La lista de editores es `EDITORES` y **falla cerrada**: sin lista, no entra nadie.
 
-#### b) GitHub — para quien administra el repositorio
+#### c) GitHub — para quien administra el repositorio
 
 Se conserva la ruta nativa `/_studio` con OAuth de GitHub. Útil para el
 mantenedor. Ojo con la diferencia de comportamiento entre las dos:
@@ -240,7 +280,8 @@ Viven **fuera del repositorio**, en `C:\dimec\studio.env.ps1`, que carga
 
 | Variable | Para qué |
 |---|---|
-| `STUDIO_GITHUB_TOKEN` | Token con el que se publican **todos** los cambios |
+| `STUDIO_GITHUB_TOKEN` | Token con el que se publican **todos** los cambios. Sin él se entra pero no se publica |
+| `EDITORES_FICHERO` | Opcional: otra ruta para las cuentas propias. Por defecto `C:dimeceditores.json` |
 | `MS_TENANT_ID` / `MS_CLIENT_ID` / `MS_CLIENT_SECRET` | Registro de aplicación en Entra ID |
 | `EDITORES` | Correos `usm.cl` autorizados, separados por comas |
 | `STUDIO_GITHUB_CLIENT_ID` / `..._SECRET` | OAuth App de GitHub (puerta del mantenedor) |
