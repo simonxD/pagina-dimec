@@ -164,11 +164,28 @@ export default defineContentConfig({
     //
     // Inicio no esta aqui: se dejo fuera de la edicion a peticion expresa.
     // ─────────────────────────────────────────────────────────────────────
+    // Prueba piloto de edicion con texto enriquecido.
+    //
+    // Es la unica pagina de tipo `page` en vez de `data`, y la diferencia es que
+    // tiene cuerpo markdown. Ese cuerpo es lo unico que Studio edita con el
+    // editor visual: negritas, listas, encabezados y enlaces. Los campos de
+    // formulario no admiten nada de eso, se comprobo en el codigo del modulo.
+    //
+    // Los datos estructurados -periodos, cargos, tarjetas- siguen en el
+    // frontmatter, porque son tablas y no prosa: convertirlos en markdown
+    // significaria que la maquetacion la decide el texto y no el diseño.
+    //
+    // Los campos que Nuxt Content inyecta en las colecciones `page` se declaran
+    // aqui solo para ocultarlos: sin esto el formulario enseña Title, SEO y
+    // Navigation, que no significan nada para quien mantiene el contenido. El
+    // titulo y la descripcion de la pagina se fijan en el .vue.
     departamento: defineCollection({
-      type: 'data',
-      source: 'paginas/departamento.yml',
+      type: 'page',
+      source: 'paginas/departamento.md',
       schema: z.object({
-        intro: parrafo('Texto de entrada', 'Párrafo que abre la página, debajo del título'),
+        title: z.string().optional().editor({ hidden: true }),
+        description: z.string().optional().editor({ hidden: true }),
+        navigation: z.boolean().default(false).editor({ hidden: true }),
         valores: z.array(z.object({
           titulo: linea('Título de la tarjeta', 'Misión, Visión...'),
           texto: parrafo('Contenido')

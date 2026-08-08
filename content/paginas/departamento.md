@@ -1,7 +1,4 @@
-intro: >-
-  El Departamento de Ingeniería Mecánica reúne la docencia, la investigación y la
-  extensión en las áreas de diseño, energía, materiales y manufactura.
-
+---
 valores:
   - titulo: Misión
     texto: ''
@@ -95,3 +92,6 @@ estructura:
   - cargo: Secretaría del Departamento
     persona: Nombre Apellido
     slug: admin-1
+---
+
+El Departamento de Ingeniería Mecánica reúne la docencia, la investigación y la extensión en las áreas de diseño, energía, materiales y manufactura.
