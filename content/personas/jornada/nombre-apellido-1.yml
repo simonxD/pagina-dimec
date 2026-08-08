@@ -27,6 +27,7 @@ publicaciones:
   - titulo: Título de la publicación
     medio: Revista o congreso
     anio: 2025
+    destacada: true
   - titulo: Título de la publicación
     medio: Revista o congreso
     anio: 2024
