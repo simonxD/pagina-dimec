@@ -1,32 +1,38 @@
-nombre: 'Nombre Apellido'
-cargo: 'Director del Departamento'
-orden: 1
-grado: 'Doctor en Ingeniería Mecánica'
-email: 'correo@ejemplo.cl'
-telefono: '+56 32 000 0000'
-oficina: 'Edificio C, oficina 000'
-web: 'https://ejemplo.cl'
-foto: ''
-areas: ['termicos', 'renovables']
-intereses: ['Combustión', 'Eficiencia energética', 'Energía solar térmica', 'Almacenamiento']
-investigaciones:
-  - titulo: 'Título del proyecto de investigación'
-    resumen: 'Una o dos frases sobre el objetivo del proyecto y su estado.'
-  - titulo: 'Segundo proyecto destacado'
-    resumen: 'Una o dos frases sobre el objetivo del proyecto y su estado.'
-publicaciones:
-  - titulo: 'Título de la publicación'
-    medio: 'Revista o congreso'
-    anio: 2025
-  - titulo: 'Título de la publicación'
-    medio: 'Revista o congreso'
-    anio: 2024
+areas:
+  - termicos
+  - renovables
+cargo: Director del Departamento
 docencia:
-  - codigo: 'IWM000'
-    nombre: 'Nombre de la asignatura'
-  - codigo: 'IWM001'
-    nombre: 'Nombre de la asignatura'
+  - codigo: IWM000
+    nombre: Nombre de la asignatura
+  - codigo: IWM001
+    nombre: Nombre de la asignatura
+email: mallendes@usm.cl
+foto: ""
+grado: Doctor en Ingeniería Mecánica
+intereses:
+  - Combustión
+  - Eficiencia energética
+  - Energía solar térmica
+  - Almacenamiento
+investigaciones:
+  - titulo: Título del proyecto de investigación
+    resumen: Una o dos frases sobre el objetivo del proyecto y su estado.
+  - titulo: Segundo proyecto destacado
+    resumen: Una o dos frases sobre el objetivo del proyecto y su estado.
+nombre: Martín Felipe Allendes Massoud
+oficina: Edificio C, oficina 000
+orden: 1
+publicaciones:
+  - titulo: Título de la publicación
+    medio: Revista o congreso
+    anio: 2025
+  - titulo: Título de la publicación
+    medio: Revista o congreso
+    anio: 2024
 resena: |
   Reemplaza este párrafo por la reseña real: formación, trayectoria y línea de trabajo actual.
-  
+
   Un segundo párrafo puede detallar proyectos en curso, colaboraciones y responsabilidades en el Departamento.
+telefono: +56 32 000 0000
+web: https://ejemplo.cl
