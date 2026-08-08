@@ -57,16 +57,25 @@ export default eventHandler(async (event) => {
   const clientId = process.env.MS_CLIENT_ID
   const clientSecret = process.env.MS_CLIENT_SECRET
 
-  if (!tenant || !clientId || !clientSecret) {
+  // Se comprueba tambien que no sigan puestos los marcadores del fichero de
+  // ejemplo. Son texto no vacio, asi que una comprobacion de "esta definida"
+  // los da por buenos: la peticion sale hacia Microsoft con un inquilino
+  // inventado y lo que ve quien entra es una pagina de error de Microsoft, sin
+  // ninguna pista de que el problema esta en la configuracion de este servidor.
+  const sinRellenar = [tenant, clientId, clientSecret]
+    .some(v => !v || v.startsWith('PEGAR_'))
+
+  if (sinRellenar) {
     throw createError({
       statusCode: 500,
-      statusMessage: 'Falta configurar MS_TENANT_ID, MS_CLIENT_ID o MS_CLIENT_SECRET'
+      statusMessage: 'Falta rellenar MS_TENANT_ID, MS_CLIENT_ID o MS_CLIENT_SECRET en C:\\dimec\\studio.env.ps1'
     })
   }
-  if (!process.env.STUDIO_GITHUB_TOKEN) {
+  const tokenEscritura = process.env.STUDIO_GITHUB_TOKEN
+  if (!tokenEscritura || tokenEscritura.startsWith('PEGAR_')) {
     throw createError({
       statusCode: 500,
-      statusMessage: 'Falta STUDIO_GITHUB_TOKEN: sin el, quien entre no podra publicar cambios'
+      statusMessage: 'Falta rellenar STUDIO_GITHUB_TOKEN: sin el, quien entre no podra publicar cambios'
     })
   }
 
