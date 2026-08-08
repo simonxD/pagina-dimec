@@ -1,5 +1,5 @@
 ---
-nombre: 'Nombre Apellido'
+title: 'Nombre Apellido'
 cargo: 'Director del Departamento'
 categoria: jornada
 orden: 1

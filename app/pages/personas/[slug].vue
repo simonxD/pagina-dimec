@@ -11,7 +11,7 @@ if (!persona.value) {
 }
 
 useSeoMeta({
-  title: persona.value.nombre,
+  title: persona.value.title,
   description: `${persona.value.cargo} · Departamento de Ingeniería Mecánica USM`
 })
 
@@ -22,7 +22,7 @@ const susAreas = computed(() =>
 
 <template>
   <div v-if="persona">
-    <CabeceraPagina :titulo="persona.nombre" />
+    <CabeceraPagina :titulo="persona.title" />
 
     <div class="mx-auto w-full max-w-[1200px] px-5 py-10 lg:px-2.5">
       <div class="grid gap-10 lg:grid-cols-[280px_1fr]">

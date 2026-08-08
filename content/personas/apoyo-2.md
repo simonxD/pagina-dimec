@@ -1,5 +1,5 @@
 ---
-nombre: 'Nombre Apellido'
+title: 'Nombre Apellido'
 cargo: 'Auxiliar de laboratorio'
 categoria: apoyo
 orden: 2

@@ -1,5 +1,5 @@
 ---
-nombre: 'Nombre Apellido'
+title: 'Nombre Apellido'
 cargo: 'Profesora asistente'
 categoria: jornada
 orden: 5

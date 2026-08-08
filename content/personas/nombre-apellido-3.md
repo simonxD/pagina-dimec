@@ -1,5 +1,5 @@
 ---
-nombre: 'Nombre Apellido'
+title: 'Nombre Apellido'
 cargo: 'Profesora asociada'
 categoria: jornada
 orden: 3

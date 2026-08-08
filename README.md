@@ -77,12 +77,22 @@ solo acepta cuatro valores:
 | `apoyo` | Apoyos Académicos y Auxiliares de Laboratorio |
 | `administrativos` | Administrativos |
 
-**Si una persona no aparece en la web, la causa es casi siempre una de estas tres:**
+El nombre de la persona va en el campo `title`, no en un campo `nombre` propio.
+Esto es deliberado: `title` es lo único que Studio rellena al crear una ficha
+nueva. Con un campo aparte, toda persona creada desde el editor nacía sin él, no
+pasaba la validación del esquema y Nuxt Content **la descartaba en silencio** — no
+salía en la web y no había ningún error que lo explicara.
+
+Por la misma razón, `cargo` y `categoria` tienen valor por defecto. Una ficha
+recién creada aparece en la web enseguida, en la pestaña de jornada completa y con
+un cargo «por completar». Es preferible a que desaparezca sin motivo visible: así
+el error se ve y se corrige.
+
+**Si aun así una persona no aparece:**
 
 1. `categoria` tiene un valor distinto de esos cuatro. Nuxt Content valida cada
-   fichero contra el esquema y **descarta en silencio** los que no cumplen: no hay
-   error visible, la persona simplemente no existe para el sitio.
-2. Falta un campo obligatorio (`nombre`, `cargo` o `categoria`). Mismo efecto.
+   fichero contra el esquema y descarta en silencio los que no cumplen.
+2. Falta `title`, que es el único campo sin valor por defecto.
 3. Se publicó desde Studio pero el sitio no se ha recompilado todavía. Ver §5.
 
 Las etiquetas de las pestañas están en `app/utils/personas.ts`. Añadir una

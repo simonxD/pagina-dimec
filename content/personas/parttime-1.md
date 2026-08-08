@@ -1,5 +1,5 @@
 ---
-nombre: 'Nombre Apellido'
+title: 'Nombre Apellido'
 cargo: 'Profesor de jornada parcial'
 categoria: parttime
 orden: 1

@@ -1,5 +1,5 @@
 ---
-nombre: 'Nombre Apellido'
+title: 'Nombre Apellido'
 cargo: 'Secretaria del Departamento'
 categoria: administrativos
 orden: 1

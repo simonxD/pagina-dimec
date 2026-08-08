@@ -43,9 +43,21 @@ export default defineContentConfig({
       type: 'page',
       source: 'personas/*.md',
       schema: z.object({
-        nombre: z.string().describe('Nombre y apellidos, tal como debe aparecer en la web'),
-        cargo: z.string().describe('Cargo o titulo. Ejemplo: Profesor titular'),
+        // El nombre va en `title`, no en un campo propio, porque es lo unico que
+        // Studio rellena al crear una ficha nueva. Con un campo `nombre` aparte,
+        // toda persona creada desde el editor nacia sin el, no pasaba la
+        // validacion del esquema y Nuxt Content la descartaba en silencio: no
+        // salia en la web y no habia ningun error que lo explicara.
+        title: z.string().describe('Nombre y apellidos, tal como debe aparecer en la web'),
+
+        // Por la misma razon, los demas campos obligatorios llevan un valor por
+        // defecto. Una ficha recien creada se ve en la web enseguida, con textos
+        // evidentes de completar. Es preferible a que desaparezca sin motivo
+        // visible: el error se ve y se arregla, en vez de tener que deducirlo.
+        cargo: z.string().default('Cargo por completar')
+          .describe('Cargo o titulo. Ejemplo: Profesor titular'),
         categoria: z.enum(['jornada', 'parttime', 'apoyo', 'administrativos'])
+          .default('jornada')
           .describe('Pestana de /personas donde aparece esta persona'),
         orden: z.number().default(100)
           .describe('Posicion dentro de su pestana. El numero mas bajo aparece primero'),
