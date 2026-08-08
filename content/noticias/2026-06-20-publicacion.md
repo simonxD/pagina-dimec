@@ -1,8 +1,12 @@
 ---
-titulo: 'Título de la publicación'
-fecha: 2026-06-20
+title: 2026 06 20 Publicacion
+fecha: 2026-06-19
+imagen: ""
 red: instagram
-url: 'https://www.instagram.com/'
-imagen: ''
+titulo: Título de la publicación
+url: https://www.instagram.com/
 ---
 
+aaaaaaaa
+
+ss
