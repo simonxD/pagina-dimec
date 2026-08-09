@@ -12,24 +12,34 @@ export const categorias = [
   { id: 'administrativos', label: 'Administrativos' }
 ] as const
 
+/** Pasa un texto a la forma que se usa en direcciones web. */
+export function aSlug(texto: string | undefined): string {
+  return String(texto ?? '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')   // quita las tildes
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')         // espacios y signos pasan a guion
+    .replace(/^-+|-+$/g, '')
+}
+
+/** Nombre del fichero, sin carpeta ni extensión. */
+export function slugPersona(stem: string | undefined): string {
+  return aSlug(String(stem ?? '').split('/').pop())
+}
+
 /**
- * Dirección de la ficha de una persona a partir de su fichero.
+ * Dirección de la ficha de una persona.
+ *
+ * Sale del **nombre**, no del nombre del fichero: quien edita escribe "Martín
+ * Felipe Allendes" y la dirección queda /personas/martin-felipe-allendes, sin
+ * tener que renombrar nada. El nombre del fichero solo se usa como reserva, para
+ * las fichas que aún no tengan nombre escrito.
  *
  * Las colecciones de tipo `data` no generan `path` automáticamente como hacían
- * las de tipo `page`, así que la ruta se construye aquí desde el nombre del
- * fichero (`stem`), que es lo que identifica a cada persona.
- *
- * Se quitan las tildes: el editor puede llamar al fichero "simón-ramos.yml" y
- * eso produciría una dirección con caracteres que hay que codificar, fea de
- * copiar y de compartir.
+ * las de tipo `page`, así que la ruta se construye aquí.
  */
-export function slugPersona(stem: string | undefined): string {
-  return String(stem ?? '').split('/').pop()!
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')       // quita las tildes
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')  // espacios y signos pasan a guion
-    .replace(/^-+|-+$/g, '')
+export function rutaPersona(persona: { stem?: string, nombre?: string }): string {
+  return `/personas/${aSlug(persona.nombre) || slugPersona(persona.stem)}`
 }
 
 /**
@@ -48,8 +58,4 @@ export function categoriaPersona(persona: { stem?: string }): string {
 
 export function etiquetaCategoria(id: string): string {
   return categorias.find(c => c.id === id)?.label ?? ''
-}
-
-export function rutaPersona(persona: { stem?: string }): string {
-  return `/personas/${slugPersona(persona.stem)}`
 }

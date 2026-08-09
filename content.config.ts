@@ -131,35 +131,37 @@ export default defineContentConfig({
         // que no cumple el esquema, sin error ni aviso.
         cargo: z.string().default('Cargo por completar')
           .editor({ label: 'Cargo', description: 'Ejemplo: Profesora asociada' }),
-        orden: z.number().default(100)
-          .editor({ label: 'Orden', description: 'Posición dentro de su pestaña. El número más bajo aparece primero' }),
+        orden: z.number()
+          .editor({
+            label: 'Orden en el listado',
+            description: 'Posición dentro de su pestaña en Personas. El 1 aparece primero, luego el 2, y así. Si dos personas repiten número, quedan en orden arbitrario.'
+          })
+          .default(100),
 
-        grado: z.string().optional()
-          .editor({ label: 'Grado académico', description: 'Ejemplo: Doctor en Ingeniería Mecánica' }),
-        email: z.string().optional().editor({ label: 'Correo' }),
-        telefono: z.string().optional().editor({ label: 'Teléfono' }),
-        oficina: z.string().optional()
-          .editor({ label: 'Oficina', description: 'Ejemplo: Edificio C, oficina 210' }),
-        web: z.string().optional()
-          .editor({ label: 'Página personal', description: 'Dirección completa, con https://' }),
-        foto: z.string().optional()
-          .editor({ input: 'media', label: 'Fotografía', description: 'Se guarda en public/personas/' }),
+        grado: z.string().editor({ label: 'Grado académico', description: 'Ejemplo: Doctora en Ingeniería Mecánica' }).optional(),
+        email: z.string().editor({ label: 'Correo' }).optional(),
+        telefono: z.string().editor({ label: 'Teléfono' }).optional(),
+        oficina: z.string().editor({ label: 'Oficina', description: 'Ejemplo: Edificio C, oficina 210' }).optional(),
+        web: z.string().editor({ label: 'Página personal', description: 'Dirección completa, con https://' }).optional(),
+        foto: z.string().editor({ input: 'media', label: 'Fotografía', description: 'Se guarda en public/personas/' }).optional(),
 
-        areas: z.array(z.string()).default([])
-          .editor({ label: 'Áreas del Departamento', description: 'Identificadores de app/utils/areas.ts. Ejemplo: termicos' }),
-        intereses: z.array(z.string()).default([])
+        areas: z.array(z.string())
+          .editor({ label: 'Áreas del Departamento', description: 'Identificadores de app/utils/areas.ts. Ejemplo: termicos' })
+          .default([]),
+        intereses: z.array(z.string())
           .editor({
             label: 'Intereses',
             description: interesesConocidos.length
               ? `Uno por elemento. Si alguno coincide con los que ya se usan, cópialo tal cual para que agrupen: ${interesesConocidos.join(' · ')}`
               : 'Uno por elemento. Ejemplo: Combustión'
-          }),
+          })
+          .default([]),
 
         investigaciones: z.array(z.object({
           titulo: linea('Título'),
           resumen: parrafo('Resumen', 'Una o dos frases sobre el objetivo y el estado'),
           url: z.string().optional().editor({ label: 'Enlace' })
-        })).default([]).editor({ label: 'Investigaciones destacadas' }),
+        })).editor({ label: 'Investigaciones destacadas' }).default([]),
 
         // Una sola lista de publicaciones, con una casilla para destacar.
         //
@@ -175,12 +177,12 @@ export default defineContentConfig({
             label: '¿Destacada?',
             description: 'Marcada, aparece arriba en "Publicaciones destacadas". Sin marcar, solo en el listado completo'
           })
-        })).default([]).editor({ label: 'Publicaciones' }),
+        })).editor({ label: 'Publicaciones' }).default([]),
 
         docencia: z.array(z.object({
           codigo: linea('Código', 'Ejemplo: IWM101'),
           nombre: linea('Asignatura')
-        })).default([]).editor({ label: 'Docencia' }),
+        })).editor({ label: 'Docencia' }).default([]),
 
         resena: z.string().default('')
           .editor({

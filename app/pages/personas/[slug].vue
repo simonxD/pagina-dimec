@@ -8,7 +8,11 @@ const slug = String(route.params.slug)
 
 const { data: persona } = await useAsyncData(`persona-${slug}`, async () => {
   const todas = await queryCollection('personas').all()
-  return todas.find(p => slugPersona(p.stem) === slug) ?? null
+  // Se aceptan las dos formas -por nombre y por nombre de fichero- para que los
+  // enlaces publicados antes de este cambio sigan funcionando.
+  return todas.find(p => aSlug(p.nombre) === slug)
+    ?? todas.find(p => slugPersona(p.stem) === slug)
+    ?? null
 })
 
 if (!persona.value) {
